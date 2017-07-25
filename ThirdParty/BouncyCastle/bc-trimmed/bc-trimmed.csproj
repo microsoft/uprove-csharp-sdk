@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>bc_trimmed</RootNamespace>
+    <AssemblyName>bc-trimmed</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Arrays.cs" />
+    <Compile Include="BigInteger.cs" />
+    <Compile Include="BigIntegers.cs" />
+    <Compile Include="ECAlgorithms.cs" />
+    <Compile Include="ECCurve.cs" />
+    <Compile Include="ECDomainParameters.cs" />
+    <Compile Include="ECFieldElement.cs" />
+    <Compile Include="ECPoint.cs" />
+    <Compile Include="ECPointMap.cs" />
+    <Compile Include="FiniteFields.cs" />
+    <Compile Include="IFiniteField.cs" />
+    <Compile Include="Integers.cs" />
+    <Compile Include="LongArray.cs" />
+    <Compile Include="Mod.cs" />
+    <Compile Include="AbstractECMultiplier.cs" />
+    <Compile Include="DoubleAddMultiplier.cs" />
+    <Compile Include="ECMultiplier.cs" />
+    <Compile Include="PreCompInfo.cs" />
+    <Compile Include="ReferenceMultiplier.cs" />
+    <Compile Include="WNafL2RMultiplier.cs" />
+    <Compile Include="WNafPreCompInfo.cs" />
+    <Compile Include="WNafUtilities.cs" />
+    <Compile Include="Nat.cs" />
+    <Compile Include="Pack.cs" />
+    <Compile Include="Platform.cs" />
+    <Compile Include="PrimeField.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
