@@ -36,8 +36,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="crypto">
-      <HintPath>..\ThirdParty\BouncyCastle\bc\crypto.dll</HintPath>
+    <Reference Include="BouncyCastle">
+      <HintPath>..\ThirdParty\BouncyCastle\bc\BouncyCastle.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -14,14 +14,21 @@
 //
 //*********************************************************
 
-using System;
-
 namespace BouncyCastle
 {
-    public interface IFiniteField
+    public abstract class AbstractECMultiplier
+        : ECMultiplier
     {
-        BigInteger Characteristic { get; }
+        public virtual ECPoint Multiply(ECPoint p, BigInteger k)
+        {
+            int sign = k.SignValue;
+            if (sign == 0 || p.IsInfinity)
+                return p.Curve.Infinity;
 
-        int Dimension { get; }
+            ECPoint positive = MultiplyPositive(p, k.Abs());
+            return sign > 0 ? positive : positive.Negate();
+        }
+
+        protected abstract ECPoint MultiplyPositive(ECPoint p, BigInteger k);
     }
 }

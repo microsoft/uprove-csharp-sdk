@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
@@ -14,14 +14,21 @@
 //
 //*********************************************************
 
-using System;
-
 namespace BouncyCastle
 {
-    public interface IFiniteField
+    /**
+    * Interface for classes encapsulating a point multiplication algorithm
+    * for <code>ECPoint</code>s.
+    */
+    public interface ECMultiplier
     {
-        BigInteger Characteristic { get; }
-
-        int Dimension { get; }
+        /**
+         * Multiplies the <code>ECPoint p</code> by <code>k</code>, i.e.
+         * <code>p</code> is added <code>k</code> times to itself.
+         * @param p The <code>ECPoint</code> to be multiplied.
+         * @param k The factor by which <code>p</code> is multiplied.
+         * @return <code>p</code> multiplied by <code>k</code>.
+         */
+        ECPoint Multiply(ECPoint p, BigInteger k);
     }
 }

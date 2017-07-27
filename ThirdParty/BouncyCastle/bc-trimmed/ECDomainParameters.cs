@@ -1,37 +1,22 @@
-//***********************************************************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Math.EC;
-using Org.BouncyCastle.Utilities;
-
-namespace Org.BouncyCastle.Crypto.Parameters
+namespace BouncyCastle
 {
     public class ECDomainParameters
     {
@@ -78,7 +63,7 @@ namespace Org.BouncyCastle.Crypto.Parameters
             this.g = g.Normalize();
             this.n = n;
             this.h = h;
-            this.seed = Arrays.Clone(seed);
+            this.seed = (seed == null ? null : (byte[])seed.Clone());
         }
 
         public ECCurve Curve
@@ -103,7 +88,7 @@ namespace Org.BouncyCastle.Crypto.Parameters
 
         public byte[] GetSeed()
         {
-            return Arrays.Clone(seed);
+            return (seed == null ? null : (byte[])seed.Clone());
         }
 
         public override bool Equals(
@@ -124,10 +109,10 @@ namespace Org.BouncyCastle.Crypto.Parameters
             ECDomainParameters other)
         {
             return curve.Equals(other.curve)
-                &&	g.Equals(other.g)
-                &&	n.Equals(other.n)
-                &&	h.Equals(other.h)
-                &&	Arrays.AreEqual(seed, other.seed);
+                && g.Equals(other.g)
+                && n.Equals(other.n)
+                && h.Equals(other.h)
+                && true; // TODO: FIXME Arrays.AreEqual(seed, other.seed);
         }
 
         public override int GetHashCode()
@@ -136,7 +121,9 @@ namespace Org.BouncyCastle.Crypto.Parameters
                 ^	g.GetHashCode()
                 ^	n.GetHashCode()
                 ^	h.GetHashCode()
-                ^	Arrays.GetHashCode(seed);
+                
+                //TODO: FIXME ^	Arrays.GetHashCode(seed)
+                ;
         }
     }
 

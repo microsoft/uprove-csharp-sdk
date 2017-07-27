@@ -14,7 +14,7 @@
 #if BOUNCY_CASTLE
 
 using System;
-using Org.BouncyCastle.Math.EC;
+using BouncyCastle;
 
 namespace UProveCrypto.Math.BC
 {

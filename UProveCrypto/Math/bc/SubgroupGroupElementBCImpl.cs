@@ -15,7 +15,7 @@
 
 using System;
 
-using BCBigInt = Org.BouncyCastle.Math.BigInteger;
+using BCBigInt = BouncyCastle.BigInteger;
 
 namespace UProveCrypto.Math.BC
 {

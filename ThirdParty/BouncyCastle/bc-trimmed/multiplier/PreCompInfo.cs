@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
@@ -14,14 +14,14 @@
 //
 //*********************************************************
 
-using System;
-
 namespace BouncyCastle
 {
-    public interface IFiniteField
+    /**
+    * Interface for classes storing precomputation data for multiplication
+    * algorithms. Used as a Memento (see GOF patterns) for
+    * <code>WNafMultiplier</code>.
+    */
+    public interface PreCompInfo
     {
-        BigInteger Characteristic { get; }
-
-        int Dimension { get; }
     }
 }

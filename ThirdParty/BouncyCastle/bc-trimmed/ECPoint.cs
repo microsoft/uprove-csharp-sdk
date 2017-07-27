@@ -1,38 +1,25 @@
-//***********************************************************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
-using Org.BouncyCastle.Math.EC.Multiplier;
-
-namespace Org.BouncyCastle.Math.EC
+namespace BouncyCastle
 {
     /**
      * base class for points on elliptic curves.
@@ -77,10 +64,9 @@ namespace Org.BouncyCastle.Math.EC
         protected internal readonly ECFieldElement[] m_zs;
         protected internal readonly bool m_withCompression;
 
-        // Dictionary is (string -> PreCompInfo)
-        protected internal IDictionary m_preCompTable = null;
+        protected internal PreCompInfo m_preCompInfo = null;
 
-        protected ECPoint(ECCurve curve, ECFieldElement	x, ECFieldElement y, bool withCompression)
+        protected ECPoint(ECCurve curve, ECFieldElement x, ECFieldElement y, bool withCompression)
             : this(curve, x, y, GetInitialZCoords(curve), withCompression)
         {
         }
@@ -115,29 +101,29 @@ namespace Org.BouncyCastle.Math.EC
             }
         }
 
-        /**
-         * Normalizes this point, and then returns the affine x-coordinate.
-         * 
-         * Note: normalization can be expensive, this method is deprecated in favour
-         * of caller-controlled normalization.
-         */
-        [Obsolete("Use AffineXCoord, or Normalize() and XCoord, instead")]
-        public virtual ECFieldElement X
-        {
-            get { return Normalize().XCoord; }
-        }
+        ///**
+        // * Normalizes this point, and then returns the affine x-coordinate.
+        // * 
+        // * Note: normalization can be expensive, this method is deprecated in favour
+        // * of caller-controlled normalization.
+        // */
+        //[Obsolete("Use AffineXCoord, or Normalize() and XCoord, instead")]
+        //public virtual ECFieldElement X
+        //{
+        //    get { return Normalize().XCoord; }
+        //}
 
-        /**
-         * Normalizes this point, and then returns the affine y-coordinate.
-         * 
-         * Note: normalization can be expensive, this method is deprecated in favour
-         * of caller-controlled normalization.
-         */
-        [Obsolete("Use AffineYCoord, or Normalize() and YCoord, instead")]
-        public virtual ECFieldElement Y
-        {
-            get { return Normalize().YCoord; }
-        }
+        ///**
+        // * Normalizes this point, and then returns the affine y-coordinate.
+        // * 
+        // * Note: normalization can be expensive, this method is deprecated in favour
+        // * of caller-controlled normalization.
+        // */
+        //[Obsolete("Use AffineYCoord, or Normalize() and YCoord, instead")]
+        //public virtual ECFieldElement Y
+        //{
+        //    get { return Normalize().YCoord; }
+        //}
 
         /**
          * Returns the affine x-coordinate after checking that this point is normalized.
@@ -262,19 +248,19 @@ namespace Org.BouncyCastle.Math.EC
             {
                 case ECCurve.COORD_AFFINE:
                 case ECCurve.COORD_LAMBDA_AFFINE:
-                {
-                    return this;
-                }
-                default:
-                {
-                    ECFieldElement Z1 = RawZCoords[0];
-                    if (Z1.IsOne)
                     {
                         return this;
                     }
+                default:
+                    {
+                        ECFieldElement Z1 = RawZCoords[0];
+                        if (Z1.IsOne)
+                        {
+                            return this;
+                        }
 
-                    return Normalize(Z1.Invert());
-                }
+                        return Normalize(Z1.Invert());
+                    }
             }
         }
 
@@ -284,20 +270,20 @@ namespace Org.BouncyCastle.Math.EC
             {
                 case ECCurve.COORD_HOMOGENEOUS:
                 case ECCurve.COORD_LAMBDA_PROJECTIVE:
-                {
-                    return CreateScaledPoint(zInv, zInv);
-                }
+                    {
+                        return CreateScaledPoint(zInv, zInv);
+                    }
                 case ECCurve.COORD_JACOBIAN:
                 case ECCurve.COORD_JACOBIAN_CHUDNOVSKY:
                 case ECCurve.COORD_JACOBIAN_MODIFIED:
-                {
-                    ECFieldElement zInv2 = zInv.Square(), zInv3 = zInv2.Multiply(zInv);
-                    return CreateScaledPoint(zInv2, zInv3);
-                }
+                    {
+                        ECFieldElement zInv2 = zInv.Square(), zInv3 = zInv2.Multiply(zInv);
+                        return CreateScaledPoint(zInv2, zInv3);
+                    }
                 default:
-                {
-                    throw new InvalidOperationException("not a projective coordinate system");
-                }
+                    {
+                        throw new InvalidOperationException("not a projective coordinate system");
+                    }
             }
         }
 
@@ -314,20 +300,6 @@ namespace Org.BouncyCastle.Math.EC
         public bool IsCompressed
         {
             get { return m_withCompression; }
-        }
-
-        public virtual ECPoint ScaleX(ECFieldElement scale)
-        {
-            return IsInfinity
-                ? this
-                : Curve.CreateRawPoint(RawXCoord.Multiply(scale), RawYCoord, RawZCoords, IsCompressed);
-        }
-
-        public virtual ECPoint ScaleY(ECFieldElement scale)
-        {
-            return IsInfinity
-                ? this
-                : Curve.CreateRawPoint(RawXCoord, RawYCoord.Multiply(scale), RawZCoords, IsCompressed);
         }
 
         public override bool Equals(object obj)
@@ -467,10 +439,10 @@ namespace Org.BouncyCastle.Math.EC
         : ECPoint
     {
         protected internal ECPointBase(
-            ECCurve			curve,
-            ECFieldElement	x,
-            ECFieldElement	y,
-            bool			withCompression)
+            ECCurve curve,
+            ECFieldElement x,
+            ECFieldElement y,
+            bool withCompression)
             : base(curve, x, y, withCompression)
         {
         }
@@ -601,147 +573,47 @@ namespace Org.BouncyCastle.Math.EC
             switch (coord)
             {
                 case ECCurve.COORD_AFFINE:
-                {
-                    ECFieldElement dx = X2.Subtract(X1), dy = Y2.Subtract(Y1);
-
-                    if (dx.IsZero)
                     {
-                        if (dy.IsZero)
-                        {
-                            // this == b, i.e. this must be doubled
-                            return Twice();
-                        }
+                        ECFieldElement dx = X2.Subtract(X1), dy = Y2.Subtract(Y1);
 
-                        // this == -b, i.e. the result is the point at infinity
-                        return Curve.Infinity;
-                    }
-
-                    ECFieldElement gamma = dy.Divide(dx);
-                    ECFieldElement X3 = gamma.Square().Subtract(X1).Subtract(X2);
-                    ECFieldElement Y3 = gamma.Multiply(X1.Subtract(X3)).Subtract(Y1);
-
-                    return new FpPoint(Curve, X3, Y3, IsCompressed);
-                }
-
-                case ECCurve.COORD_HOMOGENEOUS:
-                {
-                    ECFieldElement Z1 = this.RawZCoords[0];
-                    ECFieldElement Z2 = b.RawZCoords[0];
-
-                    bool Z1IsOne = Z1.IsOne;
-                    bool Z2IsOne = Z2.IsOne;
-
-                    ECFieldElement u1 = Z1IsOne ? Y2 : Y2.Multiply(Z1);
-                    ECFieldElement u2 = Z2IsOne ? Y1 : Y1.Multiply(Z2);
-                    ECFieldElement u = u1.Subtract(u2);
-                    ECFieldElement v1 = Z1IsOne ? X2 : X2.Multiply(Z1);
-                    ECFieldElement v2 = Z2IsOne ? X1 : X1.Multiply(Z2);
-                    ECFieldElement v = v1.Subtract(v2);
-
-                    // Check if b == this or b == -this
-                    if (v.IsZero)
-                    {
-                        if (u.IsZero)
-                        {
-                            // this == b, i.e. this must be doubled
-                            return this.Twice();
-                        }
-
-                        // this == -b, i.e. the result is the point at infinity
-                        return curve.Infinity;
-                    }
-
-                    // TODO Optimize for when w == 1
-                    ECFieldElement w = Z1IsOne ? Z2 : Z2IsOne ? Z1 : Z1.Multiply(Z2);
-                    ECFieldElement vSquared = v.Square();
-                    ECFieldElement vCubed = vSquared.Multiply(v);
-                    ECFieldElement vSquaredV2 = vSquared.Multiply(v2);
-                    ECFieldElement A = u.Square().Multiply(w).Subtract(vCubed).Subtract(Two(vSquaredV2));
-
-                    ECFieldElement X3 = v.Multiply(A);
-                    ECFieldElement Y3 = vSquaredV2.Subtract(A).MultiplyMinusProduct(u, u2, vCubed);
-                    ECFieldElement Z3 = vCubed.Multiply(w);
-
-                    return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
-                }
-
-                case ECCurve.COORD_JACOBIAN:
-                case ECCurve.COORD_JACOBIAN_MODIFIED:
-                {
-                    ECFieldElement Z1 = this.RawZCoords[0];
-                    ECFieldElement Z2 = b.RawZCoords[0];
-
-                    bool Z1IsOne = Z1.IsOne;
-
-                    ECFieldElement X3, Y3, Z3, Z3Squared = null;
-
-                    if (!Z1IsOne && Z1.Equals(Z2))
-                    {
-                        // TODO Make this available as public method coZAdd?
-
-                        ECFieldElement dx = X1.Subtract(X2), dy = Y1.Subtract(Y2);
                         if (dx.IsZero)
                         {
                             if (dy.IsZero)
                             {
+                                // this == b, i.e. this must be doubled
                                 return Twice();
                             }
-                            return curve.Infinity;
+
+                            // this == -b, i.e. the result is the point at infinity
+                            return Curve.Infinity;
                         }
 
-                        ECFieldElement C = dx.Square();
-                        ECFieldElement W1 = X1.Multiply(C), W2 = X2.Multiply(C);
-                        ECFieldElement A1 = W1.Subtract(W2).Multiply(Y1);
+                        ECFieldElement gamma = dy.Divide(dx);
+                        ECFieldElement X3 = gamma.Square().Subtract(X1).Subtract(X2);
+                        ECFieldElement Y3 = gamma.Multiply(X1.Subtract(X3)).Subtract(Y1);
 
-                        X3 = dy.Square().Subtract(W1).Subtract(W2);
-                        Y3 = W1.Subtract(X3).Multiply(dy).Subtract(A1);
-                        Z3 = dx;
-
-                        if (Z1IsOne)
-                        {
-                            Z3Squared = C;
-                        }
-                        else
-                        {
-                            Z3 = Z3.Multiply(Z1);
-                        }
+                        return new FpPoint(Curve, X3, Y3, IsCompressed);
                     }
-                    else
+
+                case ECCurve.COORD_HOMOGENEOUS:
                     {
-                        ECFieldElement Z1Squared, U2, S2;
-                        if (Z1IsOne)
-                        {
-                            Z1Squared = Z1; U2 = X2; S2 = Y2;
-                        }
-                        else
-                        {
-                            Z1Squared = Z1.Square();
-                            U2 = Z1Squared.Multiply(X2);
-                            ECFieldElement Z1Cubed = Z1Squared.Multiply(Z1);
-                            S2 = Z1Cubed.Multiply(Y2);
-                        }
+                        ECFieldElement Z1 = this.RawZCoords[0];
+                        ECFieldElement Z2 = b.RawZCoords[0];
 
+                        bool Z1IsOne = Z1.IsOne;
                         bool Z2IsOne = Z2.IsOne;
-                        ECFieldElement Z2Squared, U1, S1;
-                        if (Z2IsOne)
-                        {
-                            Z2Squared = Z2; U1 = X1; S1 = Y1;
-                        }
-                        else
-                        {
-                            Z2Squared = Z2.Square();
-                            U1 = Z2Squared.Multiply(X1);
-                            ECFieldElement Z2Cubed = Z2Squared.Multiply(Z2);
-                            S1 = Z2Cubed.Multiply(Y1);
-                        }
 
-                        ECFieldElement H = U1.Subtract(U2);
-                        ECFieldElement R = S1.Subtract(S2);
+                        ECFieldElement u1 = Z1IsOne ? Y2 : Y2.Multiply(Z1);
+                        ECFieldElement u2 = Z2IsOne ? Y1 : Y1.Multiply(Z2);
+                        ECFieldElement u = u1.Subtract(u2);
+                        ECFieldElement v1 = Z1IsOne ? X2 : X2.Multiply(Z1);
+                        ECFieldElement v2 = Z2IsOne ? X1 : X1.Multiply(Z2);
+                        ECFieldElement v = v1.Subtract(v2);
 
                         // Check if b == this or b == -this
-                        if (H.IsZero)
+                        if (v.IsZero)
                         {
-                            if (R.IsZero)
+                            if (u.IsZero)
                             {
                                 // this == b, i.e. this must be doubled
                                 return this.Twice();
@@ -751,54 +623,154 @@ namespace Org.BouncyCastle.Math.EC
                             return curve.Infinity;
                         }
 
-                        ECFieldElement HSquared = H.Square();
-                        ECFieldElement G = HSquared.Multiply(H);
-                        ECFieldElement V = HSquared.Multiply(U1);
+                        // TODO Optimize for when w == 1
+                        ECFieldElement w = Z1IsOne ? Z2 : Z2IsOne ? Z1 : Z1.Multiply(Z2);
+                        ECFieldElement vSquared = v.Square();
+                        ECFieldElement vCubed = vSquared.Multiply(v);
+                        ECFieldElement vSquaredV2 = vSquared.Multiply(v2);
+                        ECFieldElement A = u.Square().Multiply(w).Subtract(vCubed).Subtract(Two(vSquaredV2));
 
-                        X3 = R.Square().Add(G).Subtract(Two(V));
-                        Y3 = V.Subtract(X3).MultiplyMinusProduct(R, G, S1);
+                        ECFieldElement X3 = v.Multiply(A);
+                        ECFieldElement Y3 = vSquaredV2.Subtract(A).Multiply(u).Subtract(vCubed.Multiply(u2));
+                        ECFieldElement Z3 = vCubed.Multiply(w);
 
-                        Z3 = H;
-                        if (!Z1IsOne)
-                        {
-                            Z3 = Z3.Multiply(Z1);
-                        }
-                        if (!Z2IsOne)
-                        {
-                            Z3 = Z3.Multiply(Z2);
-                        }
-
-                        // Alternative calculation of Z3 using fast square
-                        //X3 = four(X3);
-                        //Y3 = eight(Y3);
-                        //Z3 = doubleProductFromSquares(Z1, Z2, Z1Squared, Z2Squared).Multiply(H);
-
-                        if (Z3 == H)
-                        {
-                            Z3Squared = HSquared;
-                        }
+                        return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
                     }
 
-                    ECFieldElement[] zs;
-                    if (coord == ECCurve.COORD_JACOBIAN_MODIFIED)
+                case ECCurve.COORD_JACOBIAN:
+                case ECCurve.COORD_JACOBIAN_MODIFIED:
                     {
-                        // TODO If the result will only be used in a subsequent addition, we don't need W3
-                        ECFieldElement W3 = CalculateJacobianModifiedW(Z3, Z3Squared);
+                        ECFieldElement Z1 = this.RawZCoords[0];
+                        ECFieldElement Z2 = b.RawZCoords[0];
 
-                        zs = new ECFieldElement[] { Z3, W3 };
-                    }
-                    else
-                    {
-                        zs = new ECFieldElement[] { Z3 };
-                    }
+                        bool Z1IsOne = Z1.IsOne;
 
-                    return new FpPoint(curve, X3, Y3, zs, IsCompressed);
-                }
+                        ECFieldElement X3, Y3, Z3, Z3Squared = null;
+
+                        if (!Z1IsOne && Z1.Equals(Z2))
+                        {
+                            // TODO Make this available as public method coZAdd?
+
+                            ECFieldElement dx = X1.Subtract(X2), dy = Y1.Subtract(Y2);
+                            if (dx.IsZero)
+                            {
+                                if (dy.IsZero)
+                                {
+                                    return Twice();
+                                }
+                                return curve.Infinity;
+                            }
+
+                            ECFieldElement C = dx.Square();
+                            ECFieldElement W1 = X1.Multiply(C), W2 = X2.Multiply(C);
+                            ECFieldElement A1 = W1.Subtract(W2).Multiply(Y1);
+
+                            X3 = dy.Square().Subtract(W1).Subtract(W2);
+                            Y3 = W1.Subtract(X3).Multiply(dy).Subtract(A1);
+                            Z3 = dx;
+
+                            if (Z1IsOne)
+                            {
+                                Z3Squared = C;
+                            }
+                            else
+                            {
+                                Z3 = Z3.Multiply(Z1);
+                            }
+                        }
+                        else
+                        {
+                            ECFieldElement Z1Squared, U2, S2;
+                            if (Z1IsOne)
+                            {
+                                Z1Squared = Z1; U2 = X2; S2 = Y2;
+                            }
+                            else
+                            {
+                                Z1Squared = Z1.Square();
+                                U2 = Z1Squared.Multiply(X2);
+                                ECFieldElement Z1Cubed = Z1Squared.Multiply(Z1);
+                                S2 = Z1Cubed.Multiply(Y2);
+                            }
+
+                            bool Z2IsOne = Z2.IsOne;
+                            ECFieldElement Z2Squared, U1, S1;
+                            if (Z2IsOne)
+                            {
+                                Z2Squared = Z2; U1 = X1; S1 = Y1;
+                            }
+                            else
+                            {
+                                Z2Squared = Z2.Square();
+                                U1 = Z2Squared.Multiply(X1);
+                                ECFieldElement Z2Cubed = Z2Squared.Multiply(Z2);
+                                S1 = Z2Cubed.Multiply(Y1);
+                            }
+
+                            ECFieldElement H = U1.Subtract(U2);
+                            ECFieldElement R = S1.Subtract(S2);
+
+                            // Check if b == this or b == -this
+                            if (H.IsZero)
+                            {
+                                if (R.IsZero)
+                                {
+                                    // this == b, i.e. this must be doubled
+                                    return this.Twice();
+                                }
+
+                                // this == -b, i.e. the result is the point at infinity
+                                return curve.Infinity;
+                            }
+
+                            ECFieldElement HSquared = H.Square();
+                            ECFieldElement G = HSquared.Multiply(H);
+                            ECFieldElement V = HSquared.Multiply(U1);
+
+                            X3 = R.Square().Add(G).Subtract(Two(V));
+                            Y3 = V.Subtract(X3).Multiply(R).Subtract(S1.Multiply(G));
+
+                            Z3 = H;
+                            if (!Z1IsOne)
+                            {
+                                Z3 = Z3.Multiply(Z1);
+                            }
+                            if (!Z2IsOne)
+                            {
+                                Z3 = Z3.Multiply(Z2);
+                            }
+
+                            // Alternative calculation of Z3 using fast square
+                            //X3 = four(X3);
+                            //Y3 = eight(Y3);
+                            //Z3 = doubleProductFromSquares(Z1, Z2, Z1Squared, Z2Squared).multiply(H);
+
+                            if (Z3 == H)
+                            {
+                                Z3Squared = HSquared;
+                            }
+                        }
+
+                        ECFieldElement[] zs;
+                        if (coord == ECCurve.COORD_JACOBIAN_MODIFIED)
+                        {
+                            // TODO If the result will only be used in a subsequent addition, we don't need W3
+                            ECFieldElement W3 = CalculateJacobianModifiedW(Z3, Z3Squared);
+
+                            zs = new ECFieldElement[] { Z3, W3 };
+                        }
+                        else
+                        {
+                            zs = new ECFieldElement[] { Z3 };
+                        }
+
+                        return new FpPoint(curve, X3, Y3, zs, IsCompressed);
+                    }
 
                 default:
-                {
-                    throw new InvalidOperationException("unsupported coordinate system");
-                }
+                    {
+                        throw new InvalidOperationException("unsupported coordinate system");
+                    }
             }
         }
 
@@ -811,7 +783,7 @@ namespace Org.BouncyCastle.Math.EC
             ECCurve curve = this.Curve;
 
             ECFieldElement Y1 = this.RawYCoord;
-            if (Y1.IsZero) 
+            if (Y1.IsZero)
                 return curve.Infinity;
 
             int coord = curve.CoordinateSystem;
@@ -821,113 +793,113 @@ namespace Org.BouncyCastle.Math.EC
             switch (coord)
             {
                 case ECCurve.COORD_AFFINE:
-                {
-                    ECFieldElement X1Squared = X1.Square();
-                    ECFieldElement gamma = Three(X1Squared).Add(this.Curve.A).Divide(Two(Y1));
-                    ECFieldElement X3 = gamma.Square().Subtract(Two(X1));
-                    ECFieldElement Y3 = gamma.Multiply(X1.Subtract(X3)).Subtract(Y1);
-
-                    return new FpPoint(Curve, X3, Y3, IsCompressed);
-                }
-
-                case ECCurve.COORD_HOMOGENEOUS:
-                {
-                    ECFieldElement Z1 = this.RawZCoords[0];
-
-                    bool Z1IsOne = Z1.IsOne;
-
-                    // TODO Optimize for small negative a4 and -3
-                    ECFieldElement w = curve.A;
-                    if (!w.IsZero && !Z1IsOne)
-                    {
-                        w = w.Multiply(Z1.Square());
-                    }
-                    w = w.Add(Three(X1.Square()));
-
-                    ECFieldElement s = Z1IsOne ? Y1 : Y1.Multiply(Z1);
-                    ECFieldElement t = Z1IsOne ? Y1.Square() : s.Multiply(Y1);
-                    ECFieldElement B = X1.Multiply(t);
-                    ECFieldElement _4B = Four(B);
-                    ECFieldElement h = w.Square().Subtract(Two(_4B));
-
-                    ECFieldElement _2s = Two(s);
-                    ECFieldElement X3 = h.Multiply(_2s);
-                    ECFieldElement _2t = Two(t);
-                    ECFieldElement Y3 = _4B.Subtract(h).Multiply(w).Subtract(Two(_2t.Square()));
-                    ECFieldElement _4sSquared = Z1IsOne ? Two(_2t) : _2s.Square();
-                    ECFieldElement Z3 = Two(_4sSquared).Multiply(s);
-
-                    return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
-                }
-
-                case ECCurve.COORD_JACOBIAN:
-                {
-                    ECFieldElement Z1 = this.RawZCoords[0];
-
-                    bool Z1IsOne = Z1.IsOne;
-
-                    ECFieldElement Y1Squared = Y1.Square();
-                    ECFieldElement T = Y1Squared.Square();
-
-                    ECFieldElement a4 = curve.A;
-                    ECFieldElement a4Neg = a4.Negate();
-
-                    ECFieldElement M, S;
-                    if (a4Neg.ToBigInteger().Equals(BigInteger.ValueOf(3)))
-                    {
-                        ECFieldElement Z1Squared = Z1IsOne ? Z1 : Z1.Square();
-                        M = Three(X1.Add(Z1Squared).Multiply(X1.Subtract(Z1Squared)));
-                        S = Four(Y1Squared.Multiply(X1));
-                    }
-                    else
                     {
                         ECFieldElement X1Squared = X1.Square();
-                        M = Three(X1Squared);
-                        if (Z1IsOne)
+                        ECFieldElement gamma = Three(X1Squared).Add(this.Curve.A).Divide(Two(Y1));
+                        ECFieldElement X3 = gamma.Square().Subtract(Two(X1));
+                        ECFieldElement Y3 = gamma.Multiply(X1.Subtract(X3)).Subtract(Y1);
+
+                        return new FpPoint(Curve, X3, Y3, IsCompressed);
+                    }
+
+                case ECCurve.COORD_HOMOGENEOUS:
+                    {
+                        ECFieldElement Z1 = this.RawZCoords[0];
+
+                        bool Z1IsOne = Z1.IsOne;
+
+                        // TODO Optimize for small negative a4 and -3
+                        ECFieldElement w = curve.A;
+                        if (!w.IsZero && !Z1IsOne)
                         {
-                            M = M.Add(a4);
+                            w = w.Multiply(Z1.Square());
                         }
-                        else if (!a4.IsZero)
+                        w = w.Add(Three(X1.Square()));
+
+                        ECFieldElement s = Z1IsOne ? Y1 : Y1.Multiply(Z1);
+                        ECFieldElement t = Z1IsOne ? Y1.Square() : s.Multiply(Y1);
+                        ECFieldElement B = X1.Multiply(t);
+                        ECFieldElement _4B = Four(B);
+                        ECFieldElement h = w.Square().Subtract(Two(_4B));
+
+                        ECFieldElement _2s = Two(s);
+                        ECFieldElement X3 = h.Multiply(_2s);
+                        ECFieldElement _2t = Two(t);
+                        ECFieldElement Y3 = _4B.Subtract(h).Multiply(w).Subtract(Two(_2t.Square()));
+                        ECFieldElement _4sSquared = Z1IsOne ? Two(_2t) : _2s.Square();
+                        ECFieldElement Z3 = Two(_4sSquared).Multiply(s);
+
+                        return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
+                    }
+
+                case ECCurve.COORD_JACOBIAN:
+                    {
+                        ECFieldElement Z1 = this.RawZCoords[0];
+
+                        bool Z1IsOne = Z1.IsOne;
+
+                        ECFieldElement Y1Squared = Y1.Square();
+                        ECFieldElement T = Y1Squared.Square();
+
+                        ECFieldElement a4 = curve.A;
+                        ECFieldElement a4Neg = a4.Negate();
+
+                        ECFieldElement M, S;
+                        if (a4Neg.ToBigInteger().Equals(BigInteger.ValueOf(3)))
                         {
                             ECFieldElement Z1Squared = Z1IsOne ? Z1 : Z1.Square();
-                            ECFieldElement Z1Pow4 = Z1Squared.Square();
-                            if (a4Neg.BitLength < a4.BitLength)
-                            {
-                                M = M.Subtract(Z1Pow4.Multiply(a4Neg));
-                            }
-                            else
-                            {
-                                M = M.Add(Z1Pow4.Multiply(a4));
-                            }
+                            M = Three(X1.Add(Z1Squared).Multiply(X1.Subtract(Z1Squared)));
+                            S = Four(Y1Squared.Multiply(X1));
                         }
-                        //S = two(doubleProductFromSquares(X1, Y1Squared, X1Squared, T));
-                        S = Four(X1.Multiply(Y1Squared));
+                        else
+                        {
+                            ECFieldElement X1Squared = X1.Square();
+                            M = Three(X1Squared);
+                            if (Z1IsOne)
+                            {
+                                M = M.Add(a4);
+                            }
+                            else if (!a4.IsZero)
+                            {
+                                ECFieldElement Z1Squared = Z1IsOne ? Z1 : Z1.Square();
+                                ECFieldElement Z1Pow4 = Z1Squared.Square();
+                                if (a4Neg.BitLength < a4.BitLength)
+                                {
+                                    M = M.Subtract(Z1Pow4.Multiply(a4Neg));
+                                }
+                                else
+                                {
+                                    M = M.Add(Z1Pow4.Multiply(a4));
+                                }
+                            }
+                            //S = two(doubleProductFromSquares(X1, Y1Squared, X1Squared, T));
+                            S = Four(X1.Multiply(Y1Squared));
+                        }
+
+                        ECFieldElement X3 = M.Square().Subtract(Two(S));
+                        ECFieldElement Y3 = S.Subtract(X3).Multiply(M).Subtract(Eight(T));
+
+                        ECFieldElement Z3 = Two(Y1);
+                        if (!Z1IsOne)
+                        {
+                            Z3 = Z3.Multiply(Z1);
+                        }
+
+                        // Alternative calculation of Z3 using fast square
+                        //ECFieldElement Z3 = doubleProductFromSquares(Y1, Z1, Y1Squared, Z1Squared);
+
+                        return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
                     }
-
-                    ECFieldElement X3 = M.Square().Subtract(Two(S));
-                    ECFieldElement Y3 = S.Subtract(X3).Multiply(M).Subtract(Eight(T));
-
-                    ECFieldElement Z3 = Two(Y1);
-                    if (!Z1IsOne)
-                    {
-                        Z3 = Z3.Multiply(Z1);
-                    }
-
-                    // Alternative calculation of Z3 using fast square
-                    //ECFieldElement Z3 = doubleProductFromSquares(Y1, Z1, Y1Squared, Z1Squared);
-
-                    return new FpPoint(curve, X3, Y3, new ECFieldElement[] { Z3 }, IsCompressed);
-                }
 
                 case ECCurve.COORD_JACOBIAN_MODIFIED:
-                {
-                    return TwiceJacobianModified(true);
-                }
+                    {
+                        return TwiceJacobianModified(true);
+                    }
 
                 default:
-                {
-                    throw new InvalidOperationException("unsupported coordinate system");
-                }
+                    {
+                        throw new InvalidOperationException("unsupported coordinate system");
+                    }
             }
         }
 
@@ -950,53 +922,53 @@ namespace Org.BouncyCastle.Math.EC
             switch (coord)
             {
                 case ECCurve.COORD_AFFINE:
-                {
-                    ECFieldElement X1 = this.RawXCoord;
-                    ECFieldElement X2 = b.RawXCoord, Y2 = b.RawYCoord;
-
-                    ECFieldElement dx = X2.Subtract(X1), dy = Y2.Subtract(Y1);
-
-                    if (dx.IsZero)
                     {
-                        if (dy.IsZero)
+                        ECFieldElement X1 = this.RawXCoord;
+                        ECFieldElement X2 = b.RawXCoord, Y2 = b.RawYCoord;
+
+                        ECFieldElement dx = X2.Subtract(X1), dy = Y2.Subtract(Y1);
+
+                        if (dx.IsZero)
                         {
-                            // this == b i.e. the result is 3P
-                            return ThreeTimes();
+                            if (dy.IsZero)
+                            {
+                                // this == b i.e. the result is 3P
+                                return ThreeTimes();
+                            }
+
+                            // this == -b, i.e. the result is P
+                            return this;
                         }
 
-                        // this == -b, i.e. the result is P
-                        return this;
+                        /*
+                         * Optimized calculation of 2P + Q, as described in "Trading Inversions for
+                         * Multiplications in Elliptic Curve Cryptography", by Ciet, Joye, Lauter, Montgomery.
+                         */
+
+                        ECFieldElement X = dx.Square(), Y = dy.Square();
+                        ECFieldElement d = X.Multiply(Two(X1).Add(X2)).Subtract(Y);
+                        if (d.IsZero)
+                        {
+                            return Curve.Infinity;
+                        }
+
+                        ECFieldElement D = d.Multiply(dx);
+                        ECFieldElement I = D.Invert();
+                        ECFieldElement L1 = d.Multiply(I).Multiply(dy);
+                        ECFieldElement L2 = Two(Y1).Multiply(X).Multiply(dx).Multiply(I).Subtract(L1);
+                        ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X2);
+                        ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
+
+                        return new FpPoint(Curve, X4, Y4, IsCompressed);
                     }
-
-                    /*
-                     * Optimized calculation of 2P + Q, as described in "Trading Inversions for
-                     * Multiplications in Elliptic Curve Cryptography", by Ciet, Joye, Lauter, Montgomery.
-                     */
-
-                    ECFieldElement X = dx.Square(), Y = dy.Square();
-                    ECFieldElement d = X.Multiply(Two(X1).Add(X2)).Subtract(Y);
-                    if (d.IsZero)
-                    {
-                        return Curve.Infinity;
-                    }
-
-                    ECFieldElement D = d.Multiply(dx);
-                    ECFieldElement I = D.Invert();
-                    ECFieldElement L1 = d.Multiply(I).Multiply(dy);
-                    ECFieldElement L2 = Two(Y1).Multiply(X).Multiply(dx).Multiply(I).Subtract(L1);
-                    ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X2);
-                    ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
-
-                    return new FpPoint(Curve, X4, Y4, IsCompressed);
-                }
                 case ECCurve.COORD_JACOBIAN_MODIFIED:
-                {
-                    return TwiceJacobianModified(false).Add(b);
-                }
+                    {
+                        return TwiceJacobianModified(false).Add(b);
+                    }
                 default:
-                {
-                    return Twice().Add(b);
-                }
+                    {
+                        return Twice().Add(b);
+                    }
             }
         }
 
@@ -1015,120 +987,38 @@ namespace Org.BouncyCastle.Math.EC
             switch (coord)
             {
                 case ECCurve.COORD_AFFINE:
-                {
-                    ECFieldElement X1 = this.RawXCoord;
-
-                    ECFieldElement _2Y1 = Two(Y1);
-                    ECFieldElement X = _2Y1.Square();
-                    ECFieldElement Z = Three(X1.Square()).Add(Curve.A);
-                    ECFieldElement Y = Z.Square();
-
-                    ECFieldElement d = Three(X1).Multiply(X).Subtract(Y);
-                    if (d.IsZero)
                     {
-                        return Curve.Infinity;
+                        ECFieldElement X1 = this.RawXCoord;
+
+                        ECFieldElement _2Y1 = Two(Y1);
+                        ECFieldElement X = _2Y1.Square();
+                        ECFieldElement Z = Three(X1.Square()).Add(Curve.A);
+                        ECFieldElement Y = Z.Square();
+
+                        ECFieldElement d = Three(X1).Multiply(X).Subtract(Y);
+                        if (d.IsZero)
+                        {
+                            return Curve.Infinity;
+                        }
+
+                        ECFieldElement D = d.Multiply(_2Y1);
+                        ECFieldElement I = D.Invert();
+                        ECFieldElement L1 = d.Multiply(I).Multiply(Z);
+                        ECFieldElement L2 = X.Square().Multiply(I).Subtract(L1);
+
+                        ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X1);
+                        ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
+                        return new FpPoint(Curve, X4, Y4, IsCompressed);
                     }
-
-                    ECFieldElement D = d.Multiply(_2Y1);
-                    ECFieldElement I = D.Invert();
-                    ECFieldElement L1 = d.Multiply(I).Multiply(Z);
-                    ECFieldElement L2 = X.Square().Multiply(I).Subtract(L1);
-
-                    ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X1);
-                    ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
-                    return new FpPoint(Curve, X4, Y4, IsCompressed);
-                }
                 case ECCurve.COORD_JACOBIAN_MODIFIED:
-                {
-                    return TwiceJacobianModified(false).Add(this);
-                }
+                    {
+                        return TwiceJacobianModified(false).Add(this);
+                    }
                 default:
-                {
-                    // NOTE: Be careful about recursions between TwicePlus and ThreeTimes
-                    return Twice().Add(this);
-                }
-            }
-        }
-
-        public override ECPoint TimesPow2(int e)
-        {
-            if (e < 0)
-                throw new ArgumentException("cannot be negative", "e");
-            if (e == 0 || this.IsInfinity)
-                return this;
-            if (e == 1)
-                return Twice();
-
-            ECCurve curve = this.Curve;
-
-            ECFieldElement Y1 = this.RawYCoord;
-            if (Y1.IsZero) 
-                return curve.Infinity;
-
-            int coord = curve.CoordinateSystem;
-
-            ECFieldElement W1 = curve.A;
-            ECFieldElement X1 = this.RawXCoord;
-            ECFieldElement Z1 = this.RawZCoords.Length < 1 ? curve.FromBigInteger(BigInteger.One) : this.RawZCoords[0];
-
-            if (!Z1.IsOne)
-            {
-                switch (coord)
-                {
-                case ECCurve.COORD_HOMOGENEOUS:
-                    ECFieldElement Z1Sq = Z1.Square();
-                    X1 = X1.Multiply(Z1);
-                    Y1 = Y1.Multiply(Z1Sq);
-                    W1 = CalculateJacobianModifiedW(Z1, Z1Sq);
-                    break;
-                case ECCurve.COORD_JACOBIAN:
-                    W1 = CalculateJacobianModifiedW(Z1, null);
-                    break;
-                case ECCurve.COORD_JACOBIAN_MODIFIED:
-                    W1 = GetJacobianModifiedW();
-                    break;
-                }
-            }
-
-            for (int i = 0; i < e; ++i)
-            {
-                if (Y1.IsZero) 
-                    return curve.Infinity;
-
-                ECFieldElement X1Squared = X1.Square();
-                ECFieldElement M = Three(X1Squared);
-                ECFieldElement _2Y1 = Two(Y1);
-                ECFieldElement _2Y1Squared = _2Y1.Multiply(Y1);
-                ECFieldElement S = Two(X1.Multiply(_2Y1Squared));
-                ECFieldElement _4T = _2Y1Squared.Square();
-                ECFieldElement _8T = Two(_4T);
-
-                if (!W1.IsZero)
-                {
-                    M = M.Add(W1);
-                    W1 = Two(_8T.Multiply(W1));
-                }
-
-                X1 = M.Square().Subtract(Two(S));
-                Y1 = M.Multiply(S.Subtract(X1)).Subtract(_8T);
-                Z1 = Z1.IsOne ? _2Y1 : _2Y1.Multiply(Z1);
-            }
-
-            switch (coord)
-            {
-            case ECCurve.COORD_AFFINE:
-                ECFieldElement zInv = Z1.Invert(), zInv2 = zInv.Square(), zInv3 = zInv2.Multiply(zInv);
-                return new FpPoint(curve, X1.Multiply(zInv2), Y1.Multiply(zInv3), IsCompressed);
-            case ECCurve.COORD_HOMOGENEOUS:
-                X1 = X1.Multiply(Z1);
-                Z1 = Z1.Multiply(Z1.Square());
-                return new FpPoint(curve, X1, Y1, new ECFieldElement[] { Z1 }, IsCompressed);
-            case ECCurve.COORD_JACOBIAN:
-                return new FpPoint(curve, X1, Y1, new ECFieldElement[] { Z1 }, IsCompressed);
-            case ECCurve.COORD_JACOBIAN_MODIFIED:
-                return new FpPoint(curve, X1, Y1, new ECFieldElement[] { Z1, W1 }, IsCompressed);
-            default:
-                throw new InvalidOperationException("unsupported coordinate system");
+                    {
+                        // NOTE: Be careful about recursions between TwicePlus and ThreeTimes
+                        return Twice().Add(this);
+                    }
             }
         }
 
@@ -1162,6 +1052,7 @@ namespace Org.BouncyCastle.Math.EC
             return a.Add(b).Square().Subtract(aSquared).Subtract(bSquared);
         }
 
+        // D.3.2 pg 102 (see Note:)
         public override ECPoint Subtract(
             ECPoint b)
         {
@@ -1191,7 +1082,7 @@ namespace Org.BouncyCastle.Math.EC
         protected virtual ECFieldElement CalculateJacobianModifiedW(ECFieldElement Z, ECFieldElement ZSquared)
         {
             ECFieldElement a4 = this.Curve.A;
-            if (a4.IsZero || Z.IsOne)
+            if (a4.IsZero)
                 return a4;
 
             if (ZSquared == null)
@@ -1218,13 +1109,13 @@ namespace Org.BouncyCastle.Math.EC
             ECFieldElement W = ZZ[1];
             if (W == null)
             {
-                // NOTE: Rarely, TwicePlus will result in the need for a lazy W1 calculation here
+                // NOTE: Rarely, twicePlus will result in the need for a lazy W1 calculation here
                 ZZ[1] = W = CalculateJacobianModifiedW(ZZ[0], null);
             }
             return W;
         }
 
-        protected virtual FpPoint TwiceJacobianModified(bool calculateW)
+        protected FpPoint TwiceJacobianModified(bool calculateW)
         {
             ECFieldElement X1 = this.RawXCoord, Y1 = this.RawYCoord, Z1 = this.RawZCoords[0], W1 = GetJacobianModifiedW();
 
@@ -1243,6 +1134,4 @@ namespace Org.BouncyCastle.Math.EC
             return new FpPoint(this.Curve, X3, Y3, new ECFieldElement[] { Z3, W3 }, IsCompressed);
         }
     }
-
-    // note: F2mPoint class deleted
 }

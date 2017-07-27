@@ -16,10 +16,7 @@
 using System;
 using UProveCrypto.Math;
 
-using BCBigInt = Org.BouncyCastle.Math.BigInteger;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math.EC;
-
+using BCBigInt = BouncyCastle.BigInteger;
 
 namespace UProveCrypto.Math.BC
 {
@@ -54,12 +51,12 @@ namespace UProveCrypto.Math.BC
         /// <summary>
         /// The domain parameters object for the elliptic curve.
         /// </summary>
-        private ECDomainParameters domainParams;
+        private BouncyCastle.ECDomainParameters domainParams;
 
         /// <summary>
         /// The curve object itself.
         /// </summary>
-        private FpCurve curve;
+        private BouncyCastle.FpCurve curve;
 
         //private ECGroupRepresentation groupRepresentation;
         private GroupElement g;
@@ -87,22 +84,22 @@ namespace UProveCrypto.Math.BC
             string curveName)
             : base(p, a, b, g_x, g_y, n, groupName, curveName)
         {
-            this.curve = new FpCurve(
+            this.curve = new BouncyCastle.FpCurve(
                 new BCBigInt(1, p), 
                 new BCBigInt(1, a), 
                 new BCBigInt(1, b));
 
-            ECPoint generator = this.curve.CreatePoint(
+            BouncyCastle.ECPoint generator = this.curve.CreatePoint(
                 new BCBigInt(1, g_x), 
                 new BCBigInt(1, g_y));
 
-            this.domainParams = new ECDomainParameters(
+            this.domainParams = new BouncyCastle.ECDomainParameters(
                                     this.curve,
                                     generator,
                                     new BCBigInt(1, n));
 
             this.g = new ECGroupElementBCImpl(
-                this.domainParams.G as FpPoint);
+                this.domainParams.G as BouncyCastle.FpPoint);
         }
 
         /// <summary>
@@ -145,8 +142,8 @@ namespace UProveCrypto.Math.BC
                 throw new ArgumentNullException();
             }
 
-            FpPoint p = ecge.Point;
-            ECFieldElement x = p.AffineXCoord, y = p.AffineYCoord;
+            BouncyCastle.FpPoint p = ecge.Point;
+            BouncyCastle.ECFieldElement x = p.AffineXCoord, y = p.AffineYCoord;
 
             if (!y.Square().Equals(x.Multiply(x.Square().Add(domainParams.Curve.A)).Add(domainParams.Curve.B)))
             {
@@ -176,7 +173,7 @@ namespace UProveCrypto.Math.BC
         /// <returns>A group element.</returns>
         public override GroupElement CreateGroupElement(byte[] value)
         {
-            return new ECGroupElementBCImpl(domainParams.Curve.DecodePoint(value) as FpPoint);
+            return new ECGroupElementBCImpl(domainParams.Curve.DecodePoint(value) as BouncyCastle.FpPoint);
         }
 
         /// <summary>
@@ -188,16 +185,17 @@ namespace UProveCrypto.Math.BC
         /// <returns>A group element.</returns>
         public override GroupElement CreateGroupElement(byte[] x, byte[] y)
         {
-            FpCurve curve = (FpCurve)domainParams.Curve;
+            BouncyCastle.FpCurve curve = (BouncyCastle.FpCurve)domainParams.Curve;
             return new ECGroupElementBCImpl(
-                curve.CreatePoint(new BCBigInt(1, x), new BCBigInt(1, y)) as FpPoint);
+                curve.CreatePoint(new BCBigInt(1, x), new BCBigInt(1, y)) as BouncyCastle.FpPoint);
         }
 
         /// <summary>
         /// Updates the specified hash function with the group description elements.
         /// </summary>
         /// <param name="h">An hash function object.</param>
-        public override void UpdateHash(HashFunction h)
+        public
+            override void UpdateHash(HashFunction h)
         {
             // desc(Gq) = (p,a,b,g,q,1)
             byte[] cofactorArray = { 0x01 };
@@ -227,12 +225,12 @@ namespace UProveCrypto.Math.BC
         /// </summary>
         public override GroupElement Identity
         {
-            get { return new ECGroupElementBCImpl(domainParams.Curve.Infinity as FpPoint); }
+            get { return new ECGroupElementBCImpl(domainParams.Curve.Infinity as BouncyCastle.FpPoint); }
         }
 
-        private FpFieldElement GetX(
+        private BouncyCastle.FpFieldElement GetX(
             byte[] input, 
-            FpCurve curve, 
+            BouncyCastle.FpCurve curve, 
             int index, 
             int counter)
         {
@@ -252,7 +250,7 @@ namespace UProveCrypto.Math.BC
             }
 
             BCBigInt x = new BCBigInt(1, digest).Mod(curve.Q);
-            return curve.FromBigInteger(x) as FpFieldElement;
+            return curve.FromBigInteger(x) as BouncyCastle.FpFieldElement;
         }
 
         /// <summary>
@@ -272,14 +270,14 @@ namespace UProveCrypto.Math.BC
         public override GroupElement DeriveElement(byte[] context, byte index, out int counter)
         {
             // concatenate context and curve name
-            FpCurve curve = this.domainParams.Curve as FpCurve;
+            BouncyCastle.FpCurve curve = this.domainParams.Curve as BouncyCastle.FpCurve;
             int count = 0;
-            ECFieldElement x = null, y = null;
+            BouncyCastle.ECFieldElement x = null, y = null;
             while (y == null)
             {
                 x = GetX(context, curve, index, count);
 
-                ECFieldElement alpha = x.Multiply(x.Square().Add(curve.A)).Add(curve.B);
+                BouncyCastle.ECFieldElement alpha = x.Multiply(x.Square().Add(curve.A)).Add(curve.B);
                 if (alpha.ToBigInteger() == BCBigInt.Zero)
                 {
                     y = alpha;
@@ -291,9 +289,9 @@ namespace UProveCrypto.Math.BC
                 count++;
             }
             // determine which sqrt to return, i.e., Min(y, -y)
-            ECFieldElement minusY = y.Negate();
+            BouncyCastle.ECFieldElement minusY = y.Negate();
             counter = count - 1;
-            return new ECGroupElementBCImpl(new FpPoint(curve, x, y.ToBigInteger() < minusY.ToBigInteger() ? y : minusY));
+            return new ECGroupElementBCImpl(new BouncyCastle.FpPoint(curve, x, y.ToBigInteger() < minusY.ToBigInteger() ? y : minusY));
         }
 
         /// <summary>
@@ -316,7 +314,7 @@ namespace UProveCrypto.Math.BC
             //}
             //return value;
 
-            ECPoint p = curve.Infinity;
+            BouncyCastle.ECPoint p = curve.Infinity;
 
             int i = 0, limit = g.Length & ~1;
             while (i < limit)
@@ -326,7 +324,7 @@ namespace UProveCrypto.Math.BC
                 ECGroupElementBCImpl gi1 = g[i + 1] as ECGroupElementBCImpl;
                 FieldZqElementBCImpl fi1 = f[i + 1] as FieldZqElementBCImpl;
 
-                p = p.Add(ECAlgorithms.SumOfTwoMultiplies(gi0.Point, fi0.i, gi1.Point, fi1.i));
+                p = p.Add(BouncyCastle.ECAlgorithms.SumOfTwoMultiplies(gi0.Point, fi0.i, gi1.Point, fi1.i));
 
                 i += 2;
             }
@@ -338,7 +336,7 @@ namespace UProveCrypto.Math.BC
                 p = p.Add(gi0.Point.Multiply(fi0.i));
             }
 
-            return new ECGroupElementBCImpl(p as FpPoint);
+            return new ECGroupElementBCImpl(p as BouncyCastle.FpPoint);
         }
 
         /// <summary>

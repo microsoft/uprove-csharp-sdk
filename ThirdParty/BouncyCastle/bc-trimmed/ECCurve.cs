@@ -1,38 +1,23 @@
-//***********************************************************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 using System.Collections;
 
-using Org.BouncyCastle.Math.EC.Multiplier;
-using Org.BouncyCastle.Math.Field;
-using Org.BouncyCastle.Utilities;
-
-namespace Org.BouncyCastle.Math.EC
+namespace BouncyCastle
 {
     /// <remarks>Base class for an elliptic curve.</remarks>
     public abstract class ECCurve
@@ -51,15 +36,57 @@ namespace Org.BouncyCastle.Math.EC
             return new int[]{ COORD_AFFINE, COORD_HOMOGENEOUS, COORD_JACOBIAN, COORD_JACOBIAN_CHUDNOVSKY,
                 COORD_JACOBIAN_MODIFIED, COORD_LAMBDA_AFFINE, COORD_LAMBDA_PROJECTIVE, COORD_SKEWED };
         }
-     
-        // note: Config class removed
+
+        public class Config
+        {
+            protected ECCurve outer;
+            protected int coord;
+            protected ECMultiplier multiplier;
+
+            internal Config(ECCurve outer, int coord, ECMultiplier multiplier)
+            {
+                this.outer = outer;
+                this.coord = coord;
+                this.multiplier = multiplier;
+            }
+
+            public Config SetCoordinateSystem(int coord)
+            {
+                this.coord = coord;
+                return this;
+            }
+
+            public Config SetMultiplier(ECMultiplier multiplier)
+            {
+                this.multiplier = multiplier;
+                return this;
+            }
+
+            public ECCurve Create()
+            {
+                if (!outer.SupportsCoordinateSystem(coord))
+                {
+                    throw new InvalidOperationException("unsupported coordinate system");
+                }
+
+                ECCurve c = outer.CloneCurve();
+                if (c == outer)
+                {
+                    throw new InvalidOperationException("implementation returned current curve");
+                }
+
+                c.m_coord = coord;
+                c.m_multiplier = multiplier;
+
+                return c;
+            }
+        }
 
         protected readonly IFiniteField m_field;
         protected ECFieldElement m_a, m_b;
         protected BigInteger m_order, m_cofactor;
 
         protected int m_coord = COORD_AFFINE;
-        // note: m_endomorphism variable removed
         protected ECMultiplier m_multiplier = null;
 
         protected ECCurve(IFiniteField field)
@@ -70,15 +97,18 @@ namespace Org.BouncyCastle.Math.EC
         public abstract int FieldSize { get; }
         public abstract ECFieldElement FromBigInteger(BigInteger x);
 
-        // note: Configure method removed 
+        public virtual Config Configure()
+        {
+            return new Config(this, this.m_coord, this.m_multiplier);
+        }
 
         public virtual ECPoint CreatePoint(BigInteger x, BigInteger y)
         {
             return CreatePoint(x, y, false);
         }
 
-        [Obsolete("Per-point compression property will be removed")]
-        public virtual ECPoint CreatePoint(BigInteger x, BigInteger y, bool withCompression)
+        //[Obsolete("Per-point compression property will be removed")]
+        protected virtual ECPoint CreatePoint(BigInteger x, BigInteger y, bool withCompression)
         {
             return CreateRawPoint(FromBigInteger(x), FromBigInteger(y), withCompression);
         }
@@ -87,12 +117,8 @@ namespace Org.BouncyCastle.Math.EC
 
         protected internal abstract ECPoint CreateRawPoint(ECFieldElement x, ECFieldElement y, bool withCompression);
 
-        protected internal abstract ECPoint CreateRawPoint(ECFieldElement x, ECFieldElement y, ECFieldElement[] zs, bool withCompression);
-
         protected virtual ECMultiplier CreateDefaultMultiplier()
         {
-            // note: GLV code removed
-
             return new WNafL2RMultiplier();
         }
 
@@ -101,40 +127,26 @@ namespace Org.BouncyCastle.Math.EC
             return coord == COORD_AFFINE;
         }
 
-        public virtual PreCompInfo GetPreCompInfo(ECPoint point, string name)
+        public virtual PreCompInfo GetPreCompInfo(ECPoint p)
         {
-            CheckPoint(point);
-            lock (point)
-            {
-                IDictionary table = point.m_preCompTable;
-                return table == null ? null : (PreCompInfo)table[name];
-            }
+            CheckPoint(p);
+            return p.m_preCompInfo;
         }
 
         /**
-         * Adds <code>PreCompInfo</code> for a point on this curve, under a given name. Used by
+         * Sets the <code>PreCompInfo</code> for a point on this curve. Used by
          * <code>ECMultiplier</code>s to save the precomputation for this <code>ECPoint</code> for use
          * by subsequent multiplication.
          * 
          * @param point
          *            The <code>ECPoint</code> to store precomputations for.
-         * @param name
-         *            A <code>String</code> used to index precomputations of different types.
          * @param preCompInfo
          *            The values precomputed by the <code>ECMultiplier</code>.
          */
-        public virtual void SetPreCompInfo(ECPoint point, string name, PreCompInfo preCompInfo)
+        public virtual void SetPreCompInfo(ECPoint point, PreCompInfo preCompInfo)
         {
             CheckPoint(point);
-            lock (point)
-            {
-                IDictionary table = point.m_preCompTable;
-                if (null == table)
-                {
-                    point.m_preCompTable = table = Platform.CreateHashtable(4);
-                }
-                table[name] = preCompInfo;
-            }
+            point.m_preCompInfo = preCompInfo;
         }
 
         public virtual ECPoint ImportPoint(ECPoint p)
@@ -261,8 +273,8 @@ namespace Org.BouncyCastle.Math.EC
             if (null == other)
                 return false;
             return Field.Equals(other.Field)
-                && A.ToBigInteger().Equals(other.A.ToBigInteger())
-                && B.ToBigInteger().Equals(other.B.ToBigInteger());
+                && A.Equals(other.A)
+                && B.Equals(other.B);
         }
 
         public override bool Equals(object obj)
@@ -273,14 +285,12 @@ namespace Org.BouncyCastle.Math.EC
         public override int GetHashCode()
         {
             return Field.GetHashCode()
-                ^ Integers.RotateLeft(A.ToBigInteger().GetHashCode(), 8)
-                ^ Integers.RotateLeft(B.ToBigInteger().GetHashCode(), 16);
+                ^ Integers.RotateLeft(A.GetHashCode(), 8)
+                ^ Integers.RotateLeft(B.GetHashCode(), 16);
         }
 
         protected abstract ECPoint DecompressPoint(int yTilde, BigInteger X1);
 
-        // note: GetEndomorphism method removed
- 
         /**
          * Sets the default <code>ECMultiplier</code>, unless already set. 
          */
@@ -341,7 +351,7 @@ namespace Org.BouncyCastle.Math.EC
                         BigInteger X1 = new BigInteger(1, encoded, 1, expectedLength);
                         BigInteger Y1 = new BigInteger(1, encoded, 1 + expectedLength, expectedLength);
 
-                        p = CreatePoint(X1, Y1);
+                        p = CreatePoint(X1, Y1, false);
                         break;
                     }
 
@@ -446,11 +456,6 @@ namespace Org.BouncyCastle.Math.EC
             return new FpPoint(this, x, y, withCompression);
         }
 
-        protected internal override ECPoint CreateRawPoint(ECFieldElement x, ECFieldElement y, ECFieldElement[] zs, bool withCompression)
-        {
-            return new FpPoint(this, x, y, zs, withCompression);
-        }
-
         public override ECPoint ImportPoint(ECPoint p)
         {
             if (this != p.Curve && this.CoordinateSystem == COORD_JACOBIAN && !p.IsInfinity)
@@ -495,6 +500,4 @@ namespace Org.BouncyCastle.Math.EC
             return new FpPoint(this, x, beta, true);
         }
     }
-
-    // note: F2mCurve class deleted
 }

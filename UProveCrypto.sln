@@ -1,49 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.4
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UProveCrypto", "UProveCrypto\UProveCrypto.csproj", "{3C8F664A-B85A-4F53-87D9-AC3354085ED0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UProveSample", "UProveSample\UProveSample.csproj", "{46E74C02-29FB-4EBB-945A-98DAD73AC1A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UProveUnitTest", "UProveUnitTest\UProveUnitTest.csproj", "{61263EB0-5263-4FDA-BEC8-CC1403B973CF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3A7FA8F-84F3-417F-8520-7A97B142978C}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE.txt = LICENSE.txt
-		README.txt = README.txt
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bc-trimmed", "ThirdParty\BouncyCastle\bc-trimmed\bc-trimmed.csproj", "{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UProveParams", "UProveParams\UProveParams.csproj", "{1106ADC6-0D8D-48CD-BB43-3C2906E9D8D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489} = {E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UProveTestVectors", "UProveTestVectors\UProveTestVectors.csproj", "{24417F55-EE67-4D14-A620-C6ACA1104B57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bc-trimmed", "ThirdParty\BouncyCastle\bc-trimmed\bc-trimmed.csproj", "{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs29
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = ThirdParty\\BouncyCastle\\bc-trimmed\\bc-trimmed.csproj
-		SccProjectName1 = ThirdParty/BouncyCastle/bc-trimmed
-		SccLocalPath1 = ThirdParty\\BouncyCastle\\bc-trimmed
-		SccProjectUniqueName2 = UProveCrypto\\UProveCrypto.csproj
-		SccProjectName2 = UProveCrypto
-		SccLocalPath2 = UProveCrypto
-		SccProjectUniqueName3 = UProveSample\\UProveSample.csproj
-		SccProjectName3 = UProveSample
-		SccLocalPath3 = UProveSample
-		SccProjectUniqueName4 = UProveUnitTest\\UProveUnitTest.csproj
-		SccProjectName4 = UProveUnitTest
-		SccLocalPath4 = UProveUnitTest
-		SccProjectUniqueName5 = UProveParams\\UProveParams.csproj
-		SccProjectName5 = UProveParams
-		SccLocalPath5 = UProveParams
-		SccProjectUniqueName6 = UProveTestVectors\\UProveTestVectors.csproj
-		SccProjectName6 = UProveTestVectors
-		SccLocalPath6 = UProveTestVectors
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -61,10 +36,6 @@ Global
 		{61263EB0-5263-4FDA-BEC8-CC1403B973CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61263EB0-5263-4FDA-BEC8-CC1403B973CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61263EB0-5263-4FDA-BEC8-CC1403B973CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1106ADC6-0D8D-48CD-BB43-3C2906E9D8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1106ADC6-0D8D-48CD-BB43-3C2906E9D8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1106ADC6-0D8D-48CD-BB43-3C2906E9D8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -73,6 +44,10 @@ Global
 		{24417F55-EE67-4D14-A620-C6ACA1104B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24417F55-EE67-4D14-A620-C6ACA1104B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24417F55-EE67-4D14-A620-C6ACA1104B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,29 +1,18 @@
-//***********************************************************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 using System.Collections;
@@ -31,13 +20,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-using Org.BouncyCastle.Utilities;
-
-namespace Org.BouncyCastle.Math
+namespace BouncyCastle
 {
-#if !(NETCF_1_0 || NETCF_2_0 || SILVERLIGHT)
-    [Serializable]
-#endif
+//#if !(NETCF_1_0 || NETCF_2_0 || SILVERLIGHT)
+//    [Serializable]
+//#endif
     public class BigInteger
     {
         #region U-Prove SDK Mappings
@@ -46,14 +33,7 @@ namespace Org.BouncyCastle.Math
 
         public void SetEven()
         {
-            if (magnitude.Length == 0 || (magnitude[magnitude.Length - 1] & 1) == 0)
-            {
-                IsEven = true;
-            }
-            else
-            {
-                IsEven = false;
-            }
+            IsEven = (magnitude.Length == 0 || (magnitude[magnitude.Length - 1] & 1) == 0);
         }
 
         /// <summary>
@@ -63,15 +43,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>The BigInteger inverse with respect to addition</returns>
         public static BigInteger Opposite(BigInteger n)
         {
-            BigInteger result = n;
-
-            if (result != Zero)
-            {
-                if (result.sign == -1)
-                    result.sign = 1;
-                else
-                    result.sign = 1;
-            }
+            BigInteger result = n.Negate();
             result.SetEven();
             return result;
         }
@@ -118,14 +90,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>True if a &gt; b, false otherwise</returns>
         public static bool operator >(BigInteger a, BigInteger b)
         {
-            if (a.CompareTo(b) > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return a.CompareTo(b) > 0;
         }
 
         /// <summary>
@@ -136,14 +101,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>True if a &lt; b, false otherwise</returns>
         public static bool operator <(BigInteger a, BigInteger b)
         {
-            if (a.CompareTo(b) < 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return a.CompareTo(b) < 0;
         }
 
         /// <summary>
@@ -154,14 +112,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>True if a &gt;= b, false otherwise</returns>
         public static bool operator >=(BigInteger a, BigInteger b)
         {
-            if (a.CompareTo(b) >= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return a.CompareTo(b) >= 0;
         }
 
         /// <summary>
@@ -172,14 +123,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>True if a &lt;= b, false otherwise</returns>
         public static bool operator <=(BigInteger a, BigInteger b)
         {
-            if (a.CompareTo(b) <= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return a.CompareTo(b) <= 0;
         }
 
         /// <summary>
@@ -189,9 +133,7 @@ namespace Org.BouncyCastle.Math
         /// <returns>The BigInteger inverse with respect to addition</returns>
         public static BigInteger operator -(BigInteger n)
         {
-            BigInteger result = Opposite(n);
-            result.SetEven();
-            return result;
+            return Opposite(n);
         }
 
         /// <summary>
@@ -206,7 +148,6 @@ namespace Org.BouncyCastle.Math
             result.SetEven();
             return result;
         }
-
 
         /// <summary>
         /// Subtraction operation of two BigIntegers.
@@ -291,12 +232,12 @@ namespace Org.BouncyCastle.Math
 
         public static BigInteger DivRem(BigInteger i1, BigInteger i2, out BigInteger i3)
         {
-            BigInteger[] result = i1.DivideAndRemainder(i2);
-
-            i3 = result[1];
-            return result[0];
+            BigInteger[] qr = i1.DivideAndRemainder(i2);
+            qr[0].SetEven();
+            qr[1].SetEven();
+            i3 = qr[1];
+            return qr[0];
         }
-
 
         #endregion 
 
@@ -442,7 +383,7 @@ namespace Org.BouncyCastle.Math
         //    4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
         //};
 
-        private readonly static byte[] BitLengthTable =
+        internal readonly static byte[] BitLengthTable =
         {
             0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
             5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
@@ -534,9 +475,9 @@ namespace Org.BouncyCastle.Math
         }
 
         private BigInteger(
-            int		signum,
-            int[]	mag,
-            bool	checkMag)
+            int signum,
+            int[] mag,
+            bool checkMag)
         {
             if (checkMag)
             {
@@ -581,8 +522,8 @@ namespace Org.BouncyCastle.Math
         }
 
         public BigInteger(
-            string	str,
-            int		radix)
+            string str,
+            int radix)
         {
             if (str.Length == 0)
                 throw new FormatException("Zero length BigInteger");
@@ -720,7 +661,7 @@ namespace Org.BouncyCastle.Math
                         Debug.Assert(false);
 
                         // TODO Parse all bits at once
-//						b = b.ShiftLeft(s.Length);
+                        //						b = b.ShiftLeft(s.Length);
                     }
                     else if (radix == 8)
                     {
@@ -728,7 +669,7 @@ namespace Org.BouncyCastle.Math
                         Debug.Assert(false);
 
                         // TODO Parse all bits at once
-//						b = b.ShiftLeft(s.Length * 3);
+                        //						b = b.ShiftLeft(s.Length * 3);
                     }
                     else if (radix == 16)
                     {
@@ -748,15 +689,15 @@ namespace Org.BouncyCastle.Math
             }
 
             // Note: This is the previous (slower) algorithm
-//			while (index < value.Length)
-//            {
-//				char c = value[index];
-//				string s = c.ToString();
-//				int i = Int32.Parse(s, style);
-//
-//                b = b.Multiply(r).Add(ValueOf(i));
-//                index++;
-//            }
+            //			while (index < value.Length)
+            //            {
+            //				char c = value[index];
+            //				string s = c.ToString();
+            //				int i = Int32.Parse(s, style);
+            //
+            //                b = b.Multiply(r).Add(ValueOf(i));
+            //                index++;
+            //            }
 
             magnitude = b.magnitude;
         }
@@ -768,9 +709,9 @@ namespace Org.BouncyCastle.Math
         }
 
         public BigInteger(
-            byte[]	bytes,
-            int		offset,
-            int		length)
+            byte[] bytes,
+            int offset,
+            int length)
         {
             if (length == 0)
                 throw new FormatException("Zero length BigInteger");
@@ -824,9 +765,9 @@ namespace Org.BouncyCastle.Math
         }
 
         private static int[] MakeMagnitude(
-            byte[]	bytes,
-            int		offset,
-            int		length)
+            byte[] bytes,
+            int offset,
+            int length)
         {
             int end = offset + length;
 
@@ -881,17 +822,17 @@ namespace Org.BouncyCastle.Math
         }
 
         public BigInteger(
-            int		sign,
-            byte[]	bytes)
+            int sign,
+            byte[] bytes)
             : this(sign, bytes, 0, bytes.Length)
         {
         }
 
         public BigInteger(
-            int		sign,
-            byte[]	bytes,
-            int		offset,
-            int		length)
+            int sign,
+            byte[] bytes,
+            int offset,
+            int length)
         {
             if (sign < -1 || sign > 1)
                 throw new FormatException("Invalid sign value");
@@ -910,8 +851,8 @@ namespace Org.BouncyCastle.Math
         }
 
         public BigInteger(
-            int		sizeInBits,
-            Random	random)
+            int sizeInBits,
+            Random random)
         {
             if (sizeInBits < 0)
                 throw new ArgumentException("sizeInBits must be non-negative");
@@ -939,9 +880,9 @@ namespace Org.BouncyCastle.Math
         }
 
         public BigInteger(
-            int		bitLength,
-            int		certainty,
-            Random	random)
+            int bitLength,
+            int certainty,
+            Random random)
         {
             if (bitLength < 2)
                 throw new ArithmeticException("bitLength < 2");
@@ -952,18 +893,18 @@ namespace Org.BouncyCastle.Math
             if (bitLength == 2)
             {
                 this.magnitude = random.Next(2) == 0
-                    ?	Two.magnitude
-                    :	Three.magnitude;
+                    ? Two.magnitude
+                    : Three.magnitude;
                 return;
             }
-             
+
             int nBytes = GetByteLength(bitLength);
             byte[] b = new byte[nBytes];
 
             int xBits = BitsPerByte * nBytes - bitLength;
             byte mask = (byte)(255U >> xBits);
 
-            for (;;)
+            for (; ; )
             {
                 random.NextBytes(b);
 
@@ -1073,9 +1014,9 @@ namespace Org.BouncyCastle.Math
             // Conservatively avoid over-allocation when no overflow possible
             uint limit = uint.MaxValue;
             if (big.Length == small.Length)
-                limit -= (uint) small[0];
+                limit -= (uint)small[0];
 
-            bool possibleOverflow = (uint) big[0] >= limit;
+            bool possibleOverflow = (uint)big[0] >= limit;
 
             int[] bigCopy;
             if (possibleOverflow)
@@ -1085,7 +1026,7 @@ namespace Org.BouncyCastle.Math
             }
             else
             {
-                bigCopy = (int[]) big.Clone();
+                bigCopy = (int[])big.Clone();
             }
 
             bigCopy = AddMagnitudes(bigCopy, small);
@@ -1194,9 +1135,9 @@ namespace Org.BouncyCastle.Math
             return (int)u;
         }
 
-        private static int CalcBitLength(int sign, int indx, int[]	mag)
+        private static int CalcBitLength(int sign, int indx, int[] mag)
         {
-            for (;;)
+            for (; ; )
             {
                 if (indx >= mag.Length)
                     return 0;
@@ -1280,10 +1221,10 @@ namespace Org.BouncyCastle.Math
          * start with leading zeros.
          */
         private static int CompareTo(
-            int		xIndx,
-            int[]	x,
-            int		yIndx,
-            int[]	y)
+            int xIndx,
+            int[] x,
+            int yIndx,
+            int[] y)
         {
             while (xIndx != x.Length && x[xIndx] == 0)
             {
@@ -1299,10 +1240,10 @@ namespace Org.BouncyCastle.Math
         }
 
         private static int CompareNoLeadingZeroes(
-            int		xIndx,
-            int[]	x,
-            int		yIndx,
-            int[]	y)
+            int xIndx,
+            int[] x,
+            int yIndx,
+            int[] y)
         {
             int diff = (x.Length - y.Length) - (xIndx - yIndx);
 
@@ -1339,8 +1280,8 @@ namespace Org.BouncyCastle.Math
          * remainder)
          */
         private int[] Divide(
-            int[]	x,
-            int[]	y)
+            int[] x,
+            int[] y)
         {
             int xStart = 0;
             while (xStart < x.Length && x[xStart] == 0)
@@ -1373,7 +1314,7 @@ namespace Org.BouncyCastle.Math
                 int cBitLength = yBitLength;
                 if (shift > 0)
                 {
-//					iCount = ShiftLeft(One.magnitude, shift);
+                    //					iCount = ShiftLeft(One.magnitude, shift);
                     iCount = new int[(shift >> 5) + 1];
                     iCount[0] = 1 << (shift % 32);
 
@@ -1391,7 +1332,7 @@ namespace Org.BouncyCastle.Math
 
                 count = new int[iCount.Length];
 
-                for (;;)
+                for (; ; )
                 {
                     if (cBitLength < xBitLength
                         || CompareNoLeadingZeroes(xStart, x, cStart, c) >= 0)
@@ -1425,8 +1366,8 @@ namespace Org.BouncyCastle.Math
                     // NB: The case where c[cStart] is 1-bit is harmless
                     if (shift == 1)
                     {
-                        uint firstC = (uint) c[cStart] >> 1;
-                        uint firstX = (uint) x[xStart];
+                        uint firstC = (uint)c[cStart] >> 1;
+                        uint firstX = (uint)x[xStart];
                         if (firstC > firstX)
                             ++shift;
                     }
@@ -1485,7 +1426,7 @@ namespace Org.BouncyCastle.Math
                 return val.sign == this.sign ? result : result.Negate();
             }
 
-            int[] mag = (int[]) this.magnitude.Clone();
+            int[] mag = (int[])this.magnitude.Clone();
 
             return new BigInteger(this.sign * val.sign, Divide(mag, val.magnitude), true);
         }
@@ -1514,7 +1455,7 @@ namespace Org.BouncyCastle.Math
             }
             else
             {
-                int[] remainder = (int[]) this.magnitude.Clone();
+                int[] remainder = (int[])this.magnitude.Clone();
                 int[] quotient = Divide(remainder, val.magnitude);
 
                 biggies[0] = new BigInteger(this.sign * val.sign, quotient, true);
@@ -1639,8 +1580,8 @@ namespace Org.BouncyCastle.Math
         }
 
         private bool CheckProbablePrime(
-            int		certainty,
-            Random	random)
+            int certainty,
+            Random random)
         {
             Debug.Assert(certainty > 0);
             Debug.Assert(CompareTo(Two) > 0);
@@ -1669,22 +1610,22 @@ namespace Org.BouncyCastle.Math
 
 
             // TODO Special case for < 10^16 (RabinMiller fixed list)
-//			if (BitLength < 30)
-//			{
-//				RabinMiller against 2, 3, 5, 7, 11, 13, 23 is sufficient
-//			}
+            //			if (BitLength < 30)
+            //			{
+            //				RabinMiller against 2, 3, 5, 7, 11, 13, 23 is sufficient
+            //			}
 
 
             // TODO Is it worth trying to create a hybrid of these two?
             return RabinMillerTest(certainty, random);
-//			return SolovayStrassenTest(certainty, random);
+            //			return SolovayStrassenTest(certainty, random);
 
-//			bool rbTest = RabinMillerTest(certainty, random);
-//			bool ssTest = SolovayStrassenTest(certainty, random);
-//
-//			Debug.Assert(rbTest == ssTest);
-//
-//			return rbTest;
+            //			bool rbTest = RabinMillerTest(certainty, random);
+            //			bool ssTest = SolovayStrassenTest(certainty, random);
+            //
+            //			Debug.Assert(rbTest == ssTest);
+            //
+            //			return rbTest;
         }
 
         public bool RabinMillerTest(int certainty, Random random)
@@ -1738,94 +1679,94 @@ namespace Org.BouncyCastle.Math
             return true;
         }
 
-//		private bool SolovayStrassenTest(
-//			int		certainty,
-//			Random	random)
-//		{
-//			Debug.Assert(certainty > 0);
-//			Debug.Assert(CompareTo(Two) > 0);
-//			Debug.Assert(TestBit(0));
-//
-//			BigInteger n = this;
-//			BigInteger nMinusOne = n.Subtract(One);
-//			BigInteger e = nMinusOne.ShiftRight(1);
-//
-//			do
-//			{
-//				BigInteger a;
-//				do
-//				{
-//					a = new BigInteger(nBitLength, random);
-//				}
-//				// NB: Spec says 0 < x < n, but 1 is trivial
-//				while (a.CompareTo(One) <= 0 || a.CompareTo(n) >= 0);
-//
-//
-//				// TODO Check this is redundant given the way Jacobi() works?
-////				if (!a.Gcd(n).Equals(One))
-////					return false;
-//
-//				int x = Jacobi(a, n);
-//
-//				if (x == 0)
-//					return false;
-//
-//				BigInteger check = a.ModPow(e, n);
-//
-//				if (x == 1 && !check.Equals(One))
-//					return false;
-//
-//				if (x == -1 && !check.Equals(nMinusOne))
-//					return false;
-//
-//				--certainty;
-//			}
-//			while (certainty > 0);
-//
-//			return true;
-//		}
-//
-//		private static int Jacobi(
-//			BigInteger	a,
-//			BigInteger	b)
-//		{
-//			Debug.Assert(a.sign >= 0);
-//			Debug.Assert(b.sign > 0);
-//			Debug.Assert(b.TestBit(0));
-//			Debug.Assert(a.CompareTo(b) < 0);
-//
-//			int totalS = 1;
-//			for (;;)
-//			{
-//				if (a.sign == 0)
-//					return 0;
-//
-//				if (a.Equals(One))
-//					break;
-//
-//				int e = a.GetLowestSetBit();
-//
-//				int bLsw = b.magnitude[b.magnitude.Length - 1];
-//				if ((e & 1) != 0 && ((bLsw & 7) == 3 || (bLsw & 7) == 5))
-//					totalS = -totalS;
-//
-//				// TODO Confirm this is faster than later a1.Equals(One) test
-//				if (a.BitLength == e + 1)
-//					break;
-//				BigInteger a1 = a.ShiftRight(e);
-////				if (a1.Equals(One))
-////					break;
-//
-//				int a1Lsw = a1.magnitude[a1.magnitude.Length - 1];
-//				if ((bLsw & 3) == 3 && (a1Lsw & 3) == 3)
-//					totalS = -totalS;
-//
-////				a = b.Mod(a1);
-//				a = b.Remainder(a1);
-//				b = a1;
-//			}
-//			return totalS;
-//		}
+        //		private bool SolovayStrassenTest(
+        //			int		certainty,
+        //			Random	random)
+        //		{
+        //			Debug.Assert(certainty > 0);
+        //			Debug.Assert(CompareTo(Two) > 0);
+        //			Debug.Assert(TestBit(0));
+        //
+        //			BigInteger n = this;
+        //			BigInteger nMinusOne = n.Subtract(One);
+        //			BigInteger e = nMinusOne.ShiftRight(1);
+        //
+        //			do
+        //			{
+        //				BigInteger a;
+        //				do
+        //				{
+        //					a = new BigInteger(nBitLength, random);
+        //				}
+        //				// NB: Spec says 0 < x < n, but 1 is trivial
+        //				while (a.CompareTo(One) <= 0 || a.CompareTo(n) >= 0);
+        //
+        //
+        //				// TODO Check this is redundant given the way Jacobi() works?
+        ////				if (!a.Gcd(n).Equals(One))
+        ////					return false;
+        //
+        //				int x = Jacobi(a, n);
+        //
+        //				if (x == 0)
+        //					return false;
+        //
+        //				BigInteger check = a.ModPow(e, n);
+        //
+        //				if (x == 1 && !check.Equals(One))
+        //					return false;
+        //
+        //				if (x == -1 && !check.Equals(nMinusOne))
+        //					return false;
+        //
+        //				--certainty;
+        //			}
+        //			while (certainty > 0);
+        //
+        //			return true;
+        //		}
+        //
+        //		private static int Jacobi(
+        //			BigInteger	a,
+        //			BigInteger	b)
+        //		{
+        //			Debug.Assert(a.sign >= 0);
+        //			Debug.Assert(b.sign > 0);
+        //			Debug.Assert(b.TestBit(0));
+        //			Debug.Assert(a.CompareTo(b) < 0);
+        //
+        //			int totalS = 1;
+        //			for (;;)
+        //			{
+        //				if (a.sign == 0)
+        //					return 0;
+        //
+        //				if (a.Equals(One))
+        //					break;
+        //
+        //				int e = a.GetLowestSetBit();
+        //
+        //				int bLsw = b.magnitude[b.magnitude.Length - 1];
+        //				if ((e & 1) != 0 && ((bLsw & 7) == 3 || (bLsw & 7) == 5))
+        //					totalS = -totalS;
+        //
+        //				// TODO Confirm this is faster than later a1.Equals(One) test
+        //				if (a.BitLength == e + 1)
+        //					break;
+        //				BigInteger a1 = a.ShiftRight(e);
+        ////				if (a1.Equals(One))
+        ////					break;
+        //
+        //				int a1Lsw = a1.magnitude[a1.magnitude.Length - 1];
+        //				if ((bLsw & 3) == 3 && (a1Lsw & 3) == 3)
+        //					totalS = -totalS;
+        //
+        ////				a = b.Mod(a1);
+        //				a = b.Remainder(a1);
+        //				b = a1;
+        //			}
+        //			return totalS;
+        //		}
 
         public long LongValue
         {
@@ -1876,42 +1817,42 @@ namespace Org.BouncyCastle.Math
                 throw new ArithmeticException("Modulus must be positive");
 
             // TODO Too slow at the moment
-//			// "Fast Key Exchange with Elliptic Curve Systems" R.Schoeppel
-//			if (m.TestBit(0))
-//			{
-//				//The Almost Inverse Algorithm
-//				int k = 0;
-//				BigInteger B = One, C = Zero, F = this, G = m, tmp;
-//
-//				for (;;)
-//				{
-//					// While F is even, do F=F/u, C=C*u, k=k+1.
-//					int zeroes = F.GetLowestSetBit();
-//					if (zeroes > 0)
-//					{
-//						F = F.ShiftRight(zeroes);
-//						C = C.ShiftLeft(zeroes);
-//						k += zeroes;
-//					}
-//
-//					// If F = 1, then return B,k.
-//					if (F.Equals(One))
-//					{
-//						BigInteger half = m.Add(One).ShiftRight(1);
-//						BigInteger halfK = half.ModPow(BigInteger.ValueOf(k), m);
-//						return B.Multiply(halfK).Mod(m);
-//					}
-//
-//					if (F.CompareTo(G) < 0)
-//					{
-//						tmp = G; G = F; F = tmp;
-//						tmp = B; B = C; C = tmp;
-//					}
-//
-//					F = F.Add(G);
-//					B = B.Add(C);
-//				}
-//			}
+            //			// "Fast Key Exchange with Elliptic Curve Systems" R.Schoeppel
+            //			if (m.TestBit(0))
+            //			{
+            //				//The Almost Inverse Algorithm
+            //				int k = 0;
+            //				BigInteger B = One, C = Zero, F = this, G = m, tmp;
+            //
+            //				for (;;)
+            //				{
+            //					// While F is even, do F=F/u, C=C*u, k=k+1.
+            //					int zeroes = F.GetLowestSetBit();
+            //					if (zeroes > 0)
+            //					{
+            //						F = F.ShiftRight(zeroes);
+            //						C = C.ShiftLeft(zeroes);
+            //						k += zeroes;
+            //					}
+            //
+            //					// If F = 1, then return B,k.
+            //					if (F.Equals(One))
+            //					{
+            //						BigInteger half = m.Add(One).ShiftRight(1);
+            //						BigInteger halfK = half.ModPow(BigInteger.ValueOf(k), m);
+            //						return B.Multiply(halfK).Mod(m);
+            //					}
+            //
+            //					if (F.CompareTo(G) < 0)
+            //					{
+            //						tmp = G; G = F; F = tmp;
+            //						tmp = B; B = C; C = tmp;
+            //					}
+            //
+            //					F = F.Add(G);
+            //					B = B.Add(C);
+            //				}
+            //			}
 
             if (m.QuickPow2Check())
             {
@@ -2025,7 +1966,7 @@ namespace Org.BouncyCastle.Math
 
             if (v3.sign > 0)
             {
-                for (;;)
+                for (; ; )
                 {
                     BigInteger[] q = u3.DivideAndRemainder(v3);
                     u3 = v3;
@@ -2229,12 +2170,12 @@ namespace Org.BouncyCastle.Math
             int[][] oddPowers = new int[numPowers][];
             oddPowers[0] = zVal;
 
-            int[] zSquared = Arrays.Clone(zVal);
+            int[] zSquared = (int[])zVal.Clone();
             SquareMonty(yAccum, zSquared, m.magnitude, mDash, smallMontyModulus);
 
             for (int i = 1; i < numPowers; ++i)
             {
-                oddPowers[i] = Arrays.Clone(oddPowers[i - 1]);
+                oddPowers[i] = (int[])oddPowers[i - 1].Clone();
                 MultiplyMonty(yAccum, oddPowers[i], zSquared, m.magnitude, mDash, smallMontyModulus);
             }
 
@@ -2252,7 +2193,7 @@ namespace Org.BouncyCastle.Math
             }
             else
             {
-                yVal = Arrays.Clone(oddPowers[mult >> 1]);
+                yVal = (int[])oddPowers[mult >> 1].Clone();
             }
 
             int windowPos = 1;
@@ -2358,12 +2299,12 @@ namespace Org.BouncyCastle.Math
          * return w with w = x * x - w is assumed to have enough space.
          */
         private static int[] Square(
-            int[]	w,
-            int[]	x)
+            int[] w,
+            int[] x)
         {
             // Note: this method allows w to be only (2 * x.Length - 1) words if result will fit
-//			if (w.Length != 2 * x.Length)
-//				throw new ArgumentException("no I don't think so...");
+            //			if (w.Length != 2 * x.Length)
+            //				throw new ArgumentException("no I don't think so...");
 
             ulong c;
 
@@ -2421,7 +2362,7 @@ namespace Org.BouncyCastle.Math
         /**
          * return x with x = y * z - x is assumed to have enough space.
          */
-        private static int[] Multiply(int[]	x, int[] y, int[] z)
+        private static int[] Multiply(int[] x, int[] y, int[] z)
         {
             int i = z.Length;
 
@@ -2440,9 +2381,9 @@ namespace Org.BouncyCastle.Math
                     for (int j = y.Length - 1; j >= 0; j--)
                     {
                         val += a * (y[j] & IMASK) + (x[xBase + j] & IMASK);
-    
+
                         x[xBase + j] = (int)val;
-    
+
                         val = (long)((ulong)val >> 32);
                     }
                 }
@@ -2528,8 +2469,8 @@ namespace Org.BouncyCastle.Math
          * <br/>
          * NOTE: the indices of x, y, m, a different in HAC and in Java
          */
-        private static void MultiplyMonty(int[]	a, int[] x, int[] y, int[] m, uint mDash, bool smallMontyModulus)
-            // mDash = -m^(-1) mod b
+        private static void MultiplyMonty(int[] a, int[] x, int[] y, int[] m, uint mDash, bool smallMontyModulus)
+        // mDash = -m^(-1) mod b
         {
             int n = m.Length;
 
@@ -2607,7 +2548,7 @@ namespace Org.BouncyCastle.Math
         }
 
         private static void SquareMonty(int[] a, int[] x, int[] m, uint mDash, bool smallMontyModulus)
-            // mDash = -m^(-1) mod b
+        // mDash = -m^(-1) mod b
         {
             int n = m.Length;
 
@@ -2810,13 +2751,13 @@ namespace Org.BouncyCastle.Math
                 {
                     throw new ArithmeticException("Result too large");
                 }
-                return One.ShiftLeft((int)powOf2); 
+                return One.ShiftLeft((int)powOf2);
             }
 
             BigInteger y = One;
             BigInteger z = this;
 
-            for (;;)
+            for (; ; )
             {
                 if ((exp & 0x1) == 1)
                 {
@@ -2845,11 +2786,11 @@ namespace Org.BouncyCastle.Math
             long acc = 0;
             for (int pos = 0; pos < magnitude.Length; ++pos)
             {
-                long posVal = (uint) magnitude[pos];
+                long posVal = (uint)magnitude[pos];
                 acc = (acc << 32 | posVal) % m;
             }
 
-            return (int) acc;
+            return (int)acc;
         }
 
         /**
@@ -2897,7 +2838,7 @@ namespace Org.BouncyCastle.Math
                     Array.Copy(y, yStart, c, 0, len);
                 }
 
-                for (;;)
+                for (; ; )
                 {
                     if (cBitLength < xBitLength
                         || CompareNoLeadingZeroes(xStart, x, cStart, c) >= 0)
@@ -2930,8 +2871,8 @@ namespace Org.BouncyCastle.Math
                     // NB: The case where c[cStart] is 1-bit is harmless
                     if (shift == 1)
                     {
-                        uint firstC = (uint) c[cStart] >> 1;
-                        uint firstX = (uint) x[xStart];
+                        uint firstC = (uint)c[cStart] >> 1;
+                        uint firstX = (uint)x[xStart];
                         if (firstC > firstX)
                             ++shift;
                     }
@@ -2986,8 +2927,8 @@ namespace Org.BouncyCastle.Math
                     int rem = Remainder(val);
 
                     return rem == 0
-                        ?	Zero
-                        :	new BigInteger(sign, new int[]{ rem }, false);
+                        ? Zero
+                        : new BigInteger(sign, new int[] { rem }, false);
                 }
             }
 
@@ -3002,7 +2943,7 @@ namespace Org.BouncyCastle.Math
             }
             else
             {
-                result = (int[]) this.magnitude.Clone();
+                result = (int[])this.magnitude.Clone();
                 result = Remainder(result, n.magnitude);
             }
 
@@ -3056,8 +2997,8 @@ namespace Org.BouncyCastle.Math
          * do a left shift - this returns a new array.
          */
         private static int[] ShiftLeft(
-            int[]	mag,
-            int		n)
+            int[] mag,
+            int n)
         {
             int nInts = (int)((uint)n >> 5);
             int nBits = n & 0x1f;
@@ -3130,8 +3071,8 @@ namespace Org.BouncyCastle.Math
             if (this.nBits != -1)
             {
                 result.nBits = sign > 0
-                    ?	this.nBits
-                    :	this.nBits + n;
+                    ? this.nBits
+                    : this.nBits + n;
             }
 
             if (this.nBitLength != -1)
@@ -3146,9 +3087,9 @@ namespace Org.BouncyCastle.Math
          * do a right shift - this does it in place.
          */
         private static void ShiftRightInPlace(
-            int		start,
-            int[]	mag,
-            int		n)
+            int start,
+            int[] mag,
+            int n)
         {
             int nInts = (int)((uint)n >> 5) + start;
             int nBits = n & 0x1f;
@@ -3189,8 +3130,8 @@ namespace Org.BouncyCastle.Math
          * do a right shift by one - this does it in place.
          */
         private static void ShiftRightOneInPlace(
-            int		start,
-            int[]	mag)
+            int start,
+            int[] mag)
         {
             int i = mag.Length;
             int m = mag[i - 1];
@@ -3240,7 +3181,7 @@ namespace Org.BouncyCastle.Math
                 int magPos = this.magnitude.Length - 1 - numInts;
                 for (int i = resultLength - 1; i >= 0; --i)
                 {
-                    res[i] = (int)((uint) this.magnitude[magPos--] >> numBits);
+                    res[i] = (int)((uint)this.magnitude[magPos--] >> numBits);
 
                     if (magPos >= 0)
                     {
@@ -3263,10 +3204,10 @@ namespace Org.BouncyCastle.Math
          * returns x = x - y - we assume x is >= y
          */
         private static int[] Subtract(
-            int		xStart,
-            int[]	x,
-            int		yStart,
-            int[]	y)
+            int xStart,
+            int[] x,
+            int yStart,
+            int[] y)
         {
             Debug.Assert(yStart < y.Length);
             Debug.Assert(x.Length - xStart >= y.Length - yStart);
@@ -3279,9 +3220,9 @@ namespace Org.BouncyCastle.Math
             do
             {
                 m = (x[--iT] & IMASK) - (y[--iV] & IMASK) + borrow;
-                x[iT] = (int) m;
+                x[iT] = (int)m;
 
-//				borrow = (m < 0) ? -1 : 0;
+                //				borrow = (m < 0) ? -1 : 0;
                 borrow = (int)(m >> 63);
             }
             while (iV > yStart);
@@ -3328,10 +3269,10 @@ namespace Org.BouncyCastle.Math
         }
 
         private static int[] doSubBigLil(
-            int[]	bigMag,
-            int[]	lilMag)
+            int[] bigMag,
+            int[] lilMag)
         {
-            int[] res = (int[]) bigMag.Clone();
+            int[] res = (int[])bigMag.Clone();
 
             return Subtract(0, res, 0, lilMag);
         }
@@ -3353,8 +3294,8 @@ namespace Org.BouncyCastle.Math
                 return unsigned ? ZeroEncoding : new byte[1];
 
             int nBits = (unsigned && sign > 0)
-                ?	BitLength
-                :	BitLength + 1;
+                ? BitLength
+                : BitLength + 1;
 
             int nBytes = GetByteLength(nBits);
             byte[] bytes = new byte[nBytes];
@@ -3366,21 +3307,21 @@ namespace Org.BouncyCastle.Math
             {
                 while (magIndex > 1)
                 {
-                    uint mag = (uint) magnitude[--magIndex];
-                    bytes[--bytesIndex] = (byte) mag;
+                    uint mag = (uint)magnitude[--magIndex];
+                    bytes[--bytesIndex] = (byte)mag;
                     bytes[--bytesIndex] = (byte)(mag >> 8);
                     bytes[--bytesIndex] = (byte)(mag >> 16);
                     bytes[--bytesIndex] = (byte)(mag >> 24);
                 }
 
-                uint lastMag = (uint) magnitude[0];
+                uint lastMag = (uint)magnitude[0];
                 while (lastMag > byte.MaxValue)
                 {
-                    bytes[--bytesIndex] = (byte) lastMag;
+                    bytes[--bytesIndex] = (byte)lastMag;
                     lastMag >>= 8;
                 }
 
-                bytes[--bytesIndex] = (byte) lastMag;
+                bytes[--bytesIndex] = (byte)lastMag;
             }
             else // sign < 0
             {
@@ -3388,20 +3329,20 @@ namespace Org.BouncyCastle.Math
 
                 while (magIndex > 1)
                 {
-                    uint mag = ~((uint) magnitude[--magIndex]);
+                    uint mag = ~((uint)magnitude[--magIndex]);
 
                     if (carry)
                     {
                         carry = (++mag == uint.MinValue);
                     }
 
-                    bytes[--bytesIndex] = (byte) mag;
+                    bytes[--bytesIndex] = (byte)mag;
                     bytes[--bytesIndex] = (byte)(mag >> 8);
                     bytes[--bytesIndex] = (byte)(mag >> 16);
                     bytes[--bytesIndex] = (byte)(mag >> 24);
                 }
 
-                uint lastMag = (uint) magnitude[0];
+                uint lastMag = (uint)magnitude[0];
 
                 if (carry)
                 {
@@ -3411,11 +3352,11 @@ namespace Org.BouncyCastle.Math
 
                 while (lastMag > byte.MaxValue)
                 {
-                    bytes[--bytesIndex] = (byte) ~lastMag;
+                    bytes[--bytesIndex] = (byte)~lastMag;
                     lastMag >>= 8;
                 }
 
-                bytes[--bytesIndex] = (byte) ~lastMag;
+                bytes[--bytesIndex] = (byte)~lastMag;
 
                 if (bytesIndex > 0)
                 {
@@ -3479,86 +3420,88 @@ namespace Org.BouncyCastle.Math
 
             switch (radix)
             {
-            case 2:
-            {
-                int pos = firstNonZero;
-                sb.Append(Convert.ToString(magnitude[pos], 2));
-                while (++pos < magnitude.Length)
+                case 2:
                 {
-                    AppendZeroExtendedString(sb, Convert.ToString(magnitude[pos], 2), 32);
-                }
-                break;
-            }
-            case 8:
-            {
-                int mask = (1 << 30) - 1;
-                BigInteger u = this.Abs();
-                int bits = u.BitLength;
-                IList S = Platform.CreateArrayList();
-                while (bits > 30)
-                {
-                    S.Add(Convert.ToString(u.IntValue & mask, 8));
-                    u = u.ShiftRight(30);
-                    bits -= 30;
-                }
-                sb.Append(Convert.ToString(u.IntValue, 8));
-                for (int i = S.Count - 1; i >= 0; --i)
-                {
-                    AppendZeroExtendedString(sb, (string)S[i], 10);
-                }
-                break;
-            }
-            case 16:
-            {
-                int pos = firstNonZero;
-                sb.Append(Convert.ToString(magnitude[pos], 16));
-                while (++pos < magnitude.Length)
-                {
-                    AppendZeroExtendedString(sb, Convert.ToString(magnitude[pos], 16), 8);
-                }
-                break;
-            }
-            // TODO This could work for other radices if there is an alternative to Convert.ToString method
-            //default:
-            case 10:
-            {
-                BigInteger q = this.Abs();
-                if (q.BitLength < 64)
-                {
-                    sb.Append(Convert.ToString(q.LongValue, radix));
+                    int pos = firstNonZero;
+                    sb.Append(Convert.ToString(magnitude[pos], 2));
+                    while (++pos < magnitude.Length)
+                    {
+                        AppendZeroExtendedString(sb, Convert.ToString(magnitude[pos], 2), 32);
+                    }
                     break;
                 }
-
-                // Based on algorithm 1a from chapter 4.4 in Seminumerical Algorithms (Knuth)
-
-                // Work out the largest power of 'rdx' that is a positive 64-bit integer
-                // TODO possibly cache power/exponent against radix?
-                long limit = Int64.MaxValue / radix;
-                long power = radix;
-                int exponent = 1;
-                while (power <= limit)
+                case 8:
                 {
-                    power *= radix;
-                    ++exponent;
+                    int mask = (1 << 30) - 1;
+                    BigInteger u = this.Abs();
+                    int bits = u.BitLength;
+                    //IList S = Platform.CreateArrayList();
+                    IList S = new ArrayList();
+                    while (bits > 30)
+                    {
+                        S.Add(Convert.ToString(u.IntValue & mask, 8));
+                        u = u.ShiftRight(30);
+                        bits -= 30;
+                    }
+                    sb.Append(Convert.ToString(u.IntValue, 8));
+                    for (int i = S.Count - 1; i >= 0; --i)
+                    {
+                        AppendZeroExtendedString(sb, (string)S[i], 10);
+                    }
+                    break;
                 }
-
-                BigInteger bigPower = BigInteger.ValueOf(power);
-
-                IList S = Platform.CreateArrayList();
-                while (q.CompareTo(bigPower) >= 0)
+                case 16:
                 {
-                    BigInteger[] qr = q.DivideAndRemainder(bigPower);
-                    S.Add(Convert.ToString(qr[1].LongValue, radix));
-                    q = qr[0];
+                    int pos = firstNonZero;
+                    sb.Append(Convert.ToString(magnitude[pos], 16));
+                    while (++pos < magnitude.Length)
+                    {
+                        AppendZeroExtendedString(sb, Convert.ToString(magnitude[pos], 16), 8);
+                    }
+                    break;
                 }
-
-                sb.Append(Convert.ToString(q.LongValue, radix));
-                for (int i = S.Count - 1; i >= 0; --i)
+                // TODO This could work for other radices if there is an alternative to Convert.ToString method
+                //default:
+                case 10:
                 {
-                    AppendZeroExtendedString(sb, (string)S[i], exponent);
+                    BigInteger q = this.Abs();
+                    if (q.BitLength < 64)
+                    {
+                        sb.Append(Convert.ToString(q.LongValue, radix));
+                        break;
+                    }
+
+                    // Based on algorithm 1a from chapter 4.4 in Seminumerical Algorithms (Knuth)
+
+                    // Work out the largest power of 'rdx' that is a positive 64-bit integer
+                    // TODO possibly cache power/exponent against radix?
+                    long limit = Int64.MaxValue / radix;
+                    long power = radix;
+                    int exponent = 1;
+                    while (power <= limit)
+                    {
+                        power *= radix;
+                        ++exponent;
+                    }
+
+                    BigInteger bigPower = BigInteger.ValueOf(power);
+
+                    //IList S = Platform.CreateArrayList();
+                    IList S = new ArrayList();
+                    while (q.CompareTo(bigPower) >= 0)
+                    {
+                        BigInteger[] qr = q.DivideAndRemainder(bigPower);
+                        S.Add(Convert.ToString(qr[1].LongValue, radix));
+                        q = qr[0];
+                    }
+
+                    sb.Append(Convert.ToString(q.LongValue, radix));
+                    for (int i = S.Count - 1; i >= 0; --i)
+                    {
+                        AppendZeroExtendedString(sb, (string)S[i], exponent);
+                    }
+                    break;
                 }
-                break;
-            }
             }
 
             return sb.ToString();
@@ -3843,7 +3786,7 @@ namespace Org.BouncyCastle.Math
             Debug.Assert(n >= 0);
             Debug.Assert(n < BitLength - 1);
 
-            int[] mag = (int[]) this.magnitude.Clone();
+            int[] mag = (int[])this.magnitude.Clone();
             mag[mag.Length - 1 - (n >> 5)] ^= (1 << (n & 31)); // Flip bit
             //mag[mag.Length - 1 - (n / 32)] ^= (1 << (n % 32));
             return new BigInteger(this.sign, mag, false);

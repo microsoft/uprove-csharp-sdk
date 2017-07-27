@@ -16,7 +16,7 @@
 using System;
 using System.Runtime.Serialization;
 
-using BCBigInt = Org.BouncyCastle.Math.BigInteger;
+using BCBigInt = BouncyCastle.BigInteger;
 
 namespace UProveCrypto.Math.BC
 {

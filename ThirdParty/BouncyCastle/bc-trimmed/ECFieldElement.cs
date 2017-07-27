@@ -1,36 +1,23 @@
-//***********************************************************************************************
+//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 using System.Diagnostics;
 
-using Org.BouncyCastle.Utilities;
-
-namespace Org.BouncyCastle.Math.EC
+namespace BouncyCastle
 {
     public abstract class ECFieldElement
     {
@@ -60,26 +47,6 @@ namespace Org.BouncyCastle.Math.EC
         public virtual bool IsZero
         {
             get { return 0 == ToBigInteger().SignValue; }
-        }
-
-        public virtual ECFieldElement MultiplyMinusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
-        {
-            return Multiply(b).Subtract(x.Multiply(y));
-        }
-
-        public virtual ECFieldElement MultiplyPlusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
-        {
-            return Multiply(b).Add(x.Multiply(y));
-        }
-
-        public virtual ECFieldElement SquareMinusProduct(ECFieldElement x, ECFieldElement y)
-        {
-            return Square().Subtract(x.Multiply(y));
-        }
-
-        public virtual ECFieldElement SquarePlusProduct(ECFieldElement x, ECFieldElement y)
-        {
-            return Square().Add(x.Multiply(y));
         }
 
         public virtual bool TestBitZero()
@@ -113,7 +80,21 @@ namespace Org.BouncyCastle.Math.EC
 
         public virtual byte[] GetEncoded()
         {
-            return BigIntegers.AsUnsignedByteArray((FieldSize + 7) / 8, ToBigInteger());
+            //return BigIntegers.AsUnsignedByteArray((FieldSize + 7) / 8, ToBigInteger());
+            BigInteger n = ToBigInteger();
+            int length = (FieldSize + 7) / 8;
+
+            byte[] bytes = n.ToByteArrayUnsigned();
+
+            if (bytes.Length > length)
+                throw new ArgumentException("standard length exceeded", "n");
+
+            if (bytes.Length == length)
+                return bytes;
+
+            byte[] tmp = new byte[length];
+            Array.Copy(bytes, 0, tmp, tmp.Length - bytes.Length, bytes.Length);
+            return tmp;
         }
     }
 
@@ -140,11 +121,11 @@ namespace Org.BouncyCastle.Math.EC
             return null;
         }
 
-        [Obsolete("Use ECCurve.FromBigInteger to construct field elements")]
-        public FpFieldElement(BigInteger q, BigInteger x)
-            : this(q, CalculateResidue(q), x)
-        {
-        }
+        //[Obsolete("Use ECCurve.FromBigInteger to construct field elements")]
+        //public FpFieldElement(BigInteger q, BigInteger x)
+        //    : this(q, CalculateResidue(q), x)
+        //{
+        //}
 
         internal FpFieldElement(BigInteger q, BigInteger r, BigInteger x)
         {
@@ -209,27 +190,6 @@ namespace Org.BouncyCastle.Math.EC
             return new FpFieldElement(q, r, ModMult(x, b.ToBigInteger()));
         }
 
-        public override ECFieldElement MultiplyMinusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
-        {
-            BigInteger ax = this.x, bx = b.ToBigInteger(), xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger ab = ax.Multiply(bx);
-            BigInteger xy = xx.Multiply(yx);
-            return new FpFieldElement(q, r, ModReduce(ab.Subtract(xy)));
-        }
-
-        public override ECFieldElement MultiplyPlusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
-        {
-            BigInteger ax = this.x, bx = b.ToBigInteger(), xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger ab = ax.Multiply(bx);
-            BigInteger xy = xx.Multiply(yx);
-            BigInteger sum = ab.Add(xy);
-            if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
-            {
-                sum = sum.Subtract(q.ShiftLeft(q.BitLength));
-            }
-            return new FpFieldElement(q, r, ModReduce(sum));
-        }
-
         public override ECFieldElement Divide(
             ECFieldElement b)
         {
@@ -246,80 +206,45 @@ namespace Org.BouncyCastle.Math.EC
             return new FpFieldElement(q, r, ModMult(x, x));
         }
 
-        public override ECFieldElement SquareMinusProduct(ECFieldElement x, ECFieldElement y)
-        {
-            BigInteger ax = this.x, xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger aa = ax.Multiply(ax);
-            BigInteger xy = xx.Multiply(yx);
-            return new FpFieldElement(q, r, ModReduce(aa.Subtract(xy)));
-        }
-
-        public override ECFieldElement SquarePlusProduct(ECFieldElement x, ECFieldElement y)
-        {
-            BigInteger ax = this.x, xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger aa = ax.Multiply(ax);
-            BigInteger xy = xx.Multiply(yx);
-            BigInteger sum = aa.Add(xy);
-            if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
-            {
-                sum = sum.Subtract(q.ShiftLeft(q.BitLength));
-            }
-            return new FpFieldElement(q, r, ModReduce(sum));
-        }
-
         public override ECFieldElement Invert()
         {
             // TODO Modular inversion can be faster for a (Generalized) Mersenne Prime.
             return new FpFieldElement(q, r, ModInverse(x));
         }
 
+        // D.1.4 91
         /**
          * return a sqrt root - the routine verifies that the calculation
          * returns the right value - if none exists it returns null.
          */
         public override ECFieldElement Sqrt()
         {
-            if (IsZero || IsOne)
-                return this;
-
             if (!q.TestBit(0))
-                throw Platform.CreateNotImplementedException("even value of q");
+                //throw Platform.CreateNotImplementedException("even value of q");
+                throw new NotImplementedException("even value of q");
 
-            if (q.TestBit(1)) // q == 4m + 3
+            // p mod 4 == 3
+            if (q.TestBit(1))
             {
-                BigInteger e = q.ShiftRight(2).Add(BigInteger.One);
-                return CheckSqrt(new FpFieldElement(q, r, x.ModPow(e, q)));
+                // TODO Can this be optimised (inline the Square?)
+                // z = g^(u+1) + p, p = 4u + 3
+                ECFieldElement z = new FpFieldElement(q, r, x.ModPow(q.ShiftRight(2).Add(BigInteger.One), q));
+
+                return z.Square().Equals(this) ? z : null;
             }
 
-            if (q.TestBit(2)) // q == 8m + 5
-            {
-                BigInteger t1 = x.ModPow(q.ShiftRight(3), q);
-                BigInteger t2 = ModMult(t1, x);
-                BigInteger t3 = ModMult(t2, t1);
+            // p mod 4 == 1
+            BigInteger qMinusOne = q.Subtract(BigInteger.One);
 
-                if (t3.Equals(BigInteger.One))
-                {
-                    return CheckSqrt(new FpFieldElement(q, r, t2));
-                }
-
-                // TODO This is constant and could be precomputed
-                BigInteger t4 = BigInteger.Two.ModPow(q.ShiftRight(2), q);
-
-                BigInteger y = ModMult(t2, t4);
-
-                return CheckSqrt(new FpFieldElement(q, r, y));
-            }
-
-            // q == 8m + 1
-
-            BigInteger legendreExponent = q.ShiftRight(1);
+            BigInteger legendreExponent = qMinusOne.ShiftRight(1);
             if (!(x.ModPow(legendreExponent, q).Equals(BigInteger.One)))
                 return null;
 
+            BigInteger u = qMinusOne.ShiftRight(2);
+            BigInteger k = u.ShiftLeft(1).Add(BigInteger.One);
+
             BigInteger X = this.x;
             BigInteger fourX = ModDouble(ModDouble(X)); ;
-
-            BigInteger k = legendreExponent.Add(BigInteger.One), qMinusOne = q.Subtract(BigInteger.One);
 
             BigInteger U, V;
             Random rand = new Random();
@@ -331,7 +256,7 @@ namespace Org.BouncyCastle.Math.EC
                     P = new BigInteger(q.BitLength, rand);
                 }
                 while (P.CompareTo(q) >= 0
-                    || !ModReduce(P.Multiply(P).Subtract(fourX)).ModPow(legendreExponent, q).Equals(qMinusOne));
+                    || !(ModMult(P, P).Subtract(fourX).ModPow(legendreExponent, q).Equals(qMinusOne)));
 
                 BigInteger[] result = LucasSequence(P, X, k);
                 U = result[0];
@@ -339,7 +264,17 @@ namespace Org.BouncyCastle.Math.EC
 
                 if (ModMult(V, V).Equals(fourX))
                 {
-                    return new FpFieldElement(q, r, ModHalfAbs(V));
+                    // Integer division by 2, mod q
+                    if (V.TestBit(0))
+                    {
+                        V = V.Add(q);
+                    }
+
+                    V = V.ShiftRight(1);
+
+                    Debug.Assert(ModMult(V, V).Equals(X));
+
+                    return new FpFieldElement(q, r, V);
                 }
             }
             while (U.Equals(BigInteger.One) || U.Equals(qMinusOne));
@@ -347,15 +282,10 @@ namespace Org.BouncyCastle.Math.EC
             return null;
         }
 
-        private ECFieldElement CheckSqrt(ECFieldElement z)
-        {
-            return z.Square().Equals(this) ? z : null;
-        }
-
         private BigInteger[] LucasSequence(
-            BigInteger	P,
-            BigInteger	Q,
-            BigInteger	k)
+            BigInteger P,
+            BigInteger Q,
+            BigInteger k)
         {
             // TODO Research and apply "common-multiplicand multiplication here"
 
@@ -426,30 +356,13 @@ namespace Org.BouncyCastle.Math.EC
             return _2x;
         }
 
-        protected virtual BigInteger ModHalf(BigInteger x)
-        {
-            if (x.TestBit(0))
-            {
-                x = q.Add(x);
-            }
-            return x.ShiftRight(1);
-        }
-
-        protected virtual BigInteger ModHalfAbs(BigInteger x)
-        {
-            if (x.TestBit(0))
-            {
-                x = q.Subtract(x);
-            }
-            return x.ShiftRight(1);
-        }
-
         protected virtual BigInteger ModInverse(BigInteger x)
         {
-            int bits = FieldSize;
-            int len = (bits + 31) >> 5;
-            uint[] p = Nat.FromBigInteger(bits, q);
-            uint[] n = Nat.FromBigInteger(bits, x);
+            // Our BigInteger.ModInverse performance is quite poor, so use the new Nat/Mod classes here
+            //return x.ModInverse(q);
+            int len = (FieldSize + 31) >> 5;
+            uint[] p = Nat.FromBigInteger(len, q);
+            uint[] n = Nat.FromBigInteger(len, x);
             uint[] z = Nat.Create(len);
             Mod.Invert(p, n, z);
             return Nat.ToBigInteger(len, z);
@@ -552,7 +465,4 @@ namespace Org.BouncyCastle.Math.EC
             return q.GetHashCode() ^ base.GetHashCode();
         }
     }
-
-    // note: F2mFieldElement class deleted
-
 }

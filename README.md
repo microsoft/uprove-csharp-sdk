@@ -1,8 +1,5 @@
-[Note: this code was formerly hosted at https://uprovecsharp.codeplex.com/.
- The code from this branch has been copied "as is".]
-
-		   U-Prove Crypto SDK V1.1.3 (C# Edition)
-		   ======================================
+U-Prove Crypto SDK V1.1.3 (C# Edition)
+======================================
 
 The U-Prove Crypto SDK V1.1 (C# Edition) implements the U-Prove Cryptographic
 Specification V1.1 Revision 3 [UPCS]. This SDK was developed by Microsoft to
@@ -38,11 +35,11 @@ GENERATING RECOMMENDED PARAMETERS AND TEST VECTORS
 --------------------------------------------------
 
 Recommended parameters [UPRP] and test vectors [UPTV] used by the U-Prove SDK 
-can be re-generated for validation purposes by the UProveParams and 
-UProveTestVectors projects, respectively. The projects depend on the full
+can be re-generated for validation purposes by loading and running the UProveParams
+and UProveTestVectors projects, respectively. The projects depend on the full
 BouncyCastle library; it must be obtained from 
 http://www.bouncycastle.org/csharp/, and the compiled DLL must be placed under
-"ThirdParty\BouncyCastle\bc\crypto.dll" before compiling the projects.
+"ThirdParty\BouncyCastle\bc\BouncyCastle.dll" before compiling the projects.
 
 
 USING THE UNIT TESTS:
@@ -58,6 +55,14 @@ USING THE SDK:
 
 Add the UProveCrypto assembly to the set of References for a project.
 
+NOTES:
+------
+
+This code was formerly hosted on CodePlex (https://uprovecsharp.codeplex.com).
+The following changes have been made to the original code:
+ - The solution has been updated to Visual Studio 2017.
+ - The Bouncy Castle patch (https://uprovecsharp.codeplex.com/SourceControl/list/patches)
+   has been applied, improving efficiency of math operations.
 
 REFERENCES:
 -----------

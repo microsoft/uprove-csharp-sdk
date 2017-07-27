@@ -1,37 +1,23 @@
-﻿//***********************************************************************************************
+﻿//*********************************************************
 //
 // This file was imported from the C# Bouncy Castle project. Original license header is retained:
 //
 //
-// The Bouncy Castle Cryptographic C#® API
-//
-// License:
-// 
-// The Bouncy Castle License
+// License
 // Copyright (c) 2000-2014 The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute,
-// sub license, and/or sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 //
-//***********************************************************************************************
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+//
+//*********************************************************
 
 using System;
 using System.Diagnostics;
 
-using Org.BouncyCastle.Crypto.Utilities;
-using Org.BouncyCastle.Utilities;
-
-namespace Org.BouncyCastle.Math.EC
+namespace BouncyCastle
 {
     internal abstract class Mod
     {
@@ -67,7 +53,7 @@ namespace Org.BouncyCastle.Math.EC
 
             int uvLen = len;
 
-            for (;;)
+            for (; ; )
             {
                 while (u[uvLen - 1] == 0 && v[uvLen - 1] == 0)
                 {
@@ -101,31 +87,6 @@ namespace Org.BouncyCastle.Math.EC
             }
         }
 
-        public static uint[] Random(uint[] p)
-        {
-            int len = p.Length;
-            Random rand = new Random();
-            uint[] s = Nat.Create(len);
-
-            uint m = p[len - 1];
-            m |= m >> 1;
-            m |= m >> 2;
-            m |= m >> 4;
-            m |= m >> 8;
-            m |= m >> 16;
-
-            do
-            {
-                byte[] bytes = new byte[len << 2];
-                rand.NextBytes(bytes);
-                Pack.BE_To_UInt32(bytes, 0, s);
-                s[len - 1] &= m;
-            }
-            while (Nat.Gte(len, s, p));
-
-            return s;
-        }
-
         public static void Subtract(uint[] p, uint[] x, uint[] y, uint[] z)
         {
             int len = p.Length;
@@ -154,7 +115,7 @@ namespace Org.BouncyCastle.Math.EC
             int count = 0;
             while (u[0] == 0)
             {
-                Nat.ShiftDownWord(uLen, u, 0);
+                Nat.ShiftDownWord(u, uLen, 0);
                 count += 32;
             }
 
@@ -162,7 +123,7 @@ namespace Org.BouncyCastle.Math.EC
                 int zeroes = GetTrailingZeroes(u[0]);
                 if (zeroes > 0)
                 {
-                    Nat.ShiftDownBits(uLen, u, zeroes, 0);
+                    Nat.ShiftDownBits(u, uLen, zeroes, 0);
                     count += zeroes;
                 }
             }
@@ -182,13 +143,14 @@ namespace Org.BouncyCastle.Math.EC
                 }
 
                 Debug.Assert(xc == 0 || xc == -1);
-                Nat.ShiftDownBit(len, x, (uint)xc);
+                Nat.ShiftDownBit(x, len, (uint)xc);
             }
         }
 
         private static int GetTrailingZeroes(uint x)
         {
-            Debug.Assert(x != 0);
+            //        assert x != 0;
+
             int count = 0;
             while ((x & 1) == 0)
             {
