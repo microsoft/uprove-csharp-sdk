@@ -13,15 +13,14 @@ For more information about U-Prove, visit http://www.microsoft.com/u-prove.
 CONTENTS:
 ---------
 
-LICENSE.TXT	    - The license and patent grant under which this
-                      package is distributed
-ThirdParty          - Bouncy Castle library files
-UProveCrypto.sln    - Visual Studio 2012 solution file
-UProveCrypto/       - SDK project directory
-UProveParams	    - Recommended parameters generation project
-UProveSample/       - Sample project 
-UProveTestVectors/  - Test vectors generation project
-UProveUnitTest/     - Unit test project
+ - LICENSE: The license and patent grant under which this package is distributed
+ - ThirdParty: Bouncy Castle library files
+ - UProveCrypto.sln: Visual Studio solution file
+ - UProveCrypto: SDK project directory
+ - UProveParams: Recommended parameters generation project
+ - UProveSample: Sample project 
+ - UProveTestVectors: Test vectors generation project
+ - UProveUnitTest: Unit test project
 
 
 BUILDING THE SDK:
