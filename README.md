@@ -67,7 +67,7 @@ REFERENCES:
 -----------
 
 [UPCS]    Christian Paquin, Greg Zaverucha. U-Prove Cryptographic Specification V1.1.
-          Microsoft Corporation, Decembre 2013. http://www.microsoft.com/u-prove.
+          Microsoft Corporation, December 2013. http://www.microsoft.com/u-prove.
 
 [UPTV]	  U-Prove Cryptographic Test Vectors V1.1 (Revision 3)
           http://research.microsoft.com/apps/pubs/default.aspx?id=166983
