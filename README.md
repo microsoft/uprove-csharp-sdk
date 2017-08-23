@@ -14,13 +14,15 @@ CONTENTS:
 ---------
 
  - LICENSE: The license and patent grant under which this package is distributed
- - ThirdParty: Bouncy Castle library files
+ - ThirdParty\: Bouncy Castle library files
  - UProveCrypto.sln: Visual Studio solution file
- - UProveCrypto: SDK project directory
- - UProveParams: Recommended parameters generation project
- - UProveSample: Sample project 
- - UProveTestVectors: Test vectors generation project
- - UProveUnitTest: Unit test project
+ - UProveCrypto\: SDK project
+ - UProveParams\: Recommended parameters generation project (not included in
+                  solution by default)
+ - UProveSample\: Sample project
+ - UProveTestVectors\: Test vectors generation project (not included in
+                       solution by default)
+ - UProveUnitTest\: Unit test project
 
 
 BUILDING THE SDK:
@@ -36,10 +38,11 @@ GENERATING RECOMMENDED PARAMETERS AND TEST VECTORS
 Recommended parameters [UPRP] and test vectors [UPTV] used by the U-Prove SDK 
 can be re-generated for validation purposes by loading and running the UProveParams
 and UProveTestVectors projects, respectively. The projects depend on the full
-BouncyCastle library; it must be obtained from 
-http://www.bouncycastle.org/csharp/, and the compiled DLL must be placed under
-"ThirdParty\BouncyCastle\bc\BouncyCastle.dll" before compiling the projects.
-
+BouncyCastle library, and are therefore not included in the UProveCrypto.sln file
+by default. BouncyCastle must be obtained from 
+http://www.bouncycastle.org/csharp/, the compiled DLL must be placed under
+"ThirdParty\BouncyCastle\bc\BouncyCastle.dll", and the two projects must be added
+to the solution before compiling it.
 
 USING THE UNIT TESTS:
 ---------------------
