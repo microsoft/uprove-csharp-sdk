@@ -135,7 +135,7 @@ namespace UProveTestVectors
 
         public override string ToString(int radix = 16)
         {
-            return "x=" + point.X.ToBigInteger().ToString(radix) + "," + "y=" + point.Y.ToBigInteger().ToString(radix);
+            return "x=" + point.XCoord.ToBigInteger().ToString(radix) + "," + "y=" + point.YCoord.ToBigInteger().ToString(radix);
         }
 
     }

@@ -292,24 +292,29 @@ namespace UProveParams
         public static BigInteger FIPS_186_3_AnnexA_2_3(BigInteger p, BigInteger q, byte[] domain_parameter_seed, byte index, Formatter formater, out int count)
         {
 
-            string hashAlg = null;
+            HashAlgorithm hash;
+            //string hashAlg = null;
             if (q.BitLength >= 512)
             {
-                hashAlg = "SHA-512";
+                //hashAlg = "SHA-512";
+                hash = SHA512.Create();
             }
             else if (q.BitLength >= 256)
             {
-                hashAlg = "SHA-256";
+                //hashAlg = "SHA-256";
+                hash = SHA256.Create();
             }
             else if (q.BitLength >= 160)
             {
-                hashAlg = "SHA1";
+                //hashAlg = "SHA1";
+                hash = SHA1.Create();
             }
             else
             {
                 throw new ArgumentException("q is too small");
             }
-            HashAlgorithm hash = HashAlgorithm.Create(hashAlg);
+
+            //HashAlgorithm hash = HashAlgorithm.Create(hashAlg);
 
             BigInteger e = p.Subtract(BigInteger.One).Divide(q);
             if (formater != null)

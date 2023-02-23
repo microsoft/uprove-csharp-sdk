@@ -39,7 +39,7 @@ using UProveCrypto.PolyProof;
 namespace UProveCryptoTest
 {
     [TestClass]
-    [DeploymentItem(@"TestVectorData\", "TestVectorData")]
+    [DeploymentItem(@"..\..\..\TestVectorData\", "TestVectorData")]
 
     public class TestVectorsTest
     {

@@ -13,7 +13,6 @@
 
 using System;
 using UProveCrypto;
-using UProveCrypto.Math;
 
 namespace UProveSample
 {
@@ -48,7 +47,7 @@ namespace UProveSample
             return bytes;
         }
 
-        static private System.Security.Cryptography.RNGCryptoServiceProvider rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+        static private System.Security.Cryptography.RandomNumberGenerator rng = System.Security.Cryptography.RandomNumberGenerator.Create();
         // generates a random message with 20 random bytes and a timestamp
         private static byte[] GenerateNoncePlusTimestampMessage()
         {

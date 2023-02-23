@@ -29,7 +29,9 @@ namespace UProveCrypto.Math.BC
         /// <summary>
         /// A .Net RNGCSP for generating cryptographic random numbers.
         /// </summary>
-        private static RNGCryptoServiceProvider rngCSP = new RNGCryptoServiceProvider();
+        private static RandomNumberGenerator rngCSP = RandomNumberGenerator.Create();
+
+
 
         /// <summary>
         /// A dictionary of (x, 2^x) values.

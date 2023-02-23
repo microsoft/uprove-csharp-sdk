@@ -29,7 +29,7 @@ namespace UProveParams
         };
 
         /// <summary>
-        /// Generates the recommeded parameters.
+        /// Generates the recommended parameters.
         /// </summary>
         /// <param name="args">Output directory.</param>
         static void Main(string[] args)
@@ -56,15 +56,15 @@ namespace UProveParams
                     {
                         string outputFile = Path.Combine(outputPath, "recommendedparams_" + groupName + "_" + formatterType + ".txt");
                         writer = new System.IO.StreamWriter(outputFile);
-                        Formatter formater = new Formatter(formatterType, writer);
-                        formater.PrintText("U-Prove Recommended Parameters (" + groupName + ")");
+                        Formatter formatter = new Formatter(formatterType, writer);
+                        formatter.PrintText("U-Prove Recommended Parameters (" + groupName + ")");
                         if (groupName.StartsWith("L"))
                         {
-                            SubgroupRecommendedParameters.Print(formater, groupName);
+                            SubgroupRecommendedParameters.Print(formatter, groupName);
                         }
                         else
                         {
-                            ECRecommendedParameters.Print(formater, groupName);
+                            ECRecommendedParameters.Print(formatter, groupName);
                         }
                         Console.WriteLine("recommended parameters " + groupName + " written to " + outputFile);
                         writer.Close();

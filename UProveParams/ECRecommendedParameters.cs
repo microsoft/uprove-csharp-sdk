@@ -85,14 +85,14 @@ namespace UProveParams
         }
 
         static private string UProveHashInput = "U-Prove Recommended Parameters Profile";
-        static private HashAlgorithm hash = HashAlgorithm.Create("SHA-256");
+        static private HashAlgorithm hash = SHA256.Create();
         static private int hashByteSize = hash.HashSize / 8;
         static System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
 
         private static void CheckIsOnCurve(FpCurve curve, FpPoint point)
         {
-            ECFieldElement lhs = point.Y.Square();
-            ECFieldElement rhs = point.X.Multiply(point.X.Square().Add(curve.A)).Add(curve.B);
+            ECFieldElement lhs = point.YCoord.Square();
+            ECFieldElement rhs = point.XCoord.Multiply(point.XCoord.Square().Add(curve.A)).Add(curve.B);
             if (!lhs.Equals(rhs))
             {
                 throw new CryptographicException("point not on curve");
@@ -112,7 +112,7 @@ namespace UProveParams
             return curve.FromBigInteger(x) as FpFieldElement;
         }
 
-        public static FpPoint GetRandomPoint(string input, FpCurve curve, int index, Formatter formater, out int finalCounter)
+        public static FpPoint GetRandomPoint(string input, FpCurve curve, int index, Formatter formatter, out int finalCounter)
         {
             int counter = 0;
             ECFieldElement x = null, y = null, z = null;
@@ -131,12 +131,18 @@ namespace UProveParams
                 counter++;
             }
             finalCounter = counter - 1;
-            if (formater != null)
+            if (formatter != null)
             {
-                formater.PrintBigInteger("vr_z", "UCAHR", null, z.ToBigInteger());
+                formatter.PrintBigInteger("vr_z", "UCAHR", null, z.ToBigInteger());
             }
             ECFieldElement yPrime = y.Negate();
-            return new FpPoint(curve, x, y.ToBigInteger().CompareTo(yPrime.ToBigInteger()) < 0 ? y : yPrime);
+
+            FpPoint oldPoint = new FpPoint(curve, x, y.ToBigInteger().CompareTo(yPrime.ToBigInteger()) < 0 ? y : yPrime);
+            FpPoint newPoint = (FpPoint)curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger().CompareTo(yPrime.ToBigInteger()) < 0 ? y.ToBigInteger() : yPrime.ToBigInteger());
+            
+            System.Diagnostics.Debug.Assert(oldPoint.Equals(newPoint));
+
+            return newPoint;
         }
 
         static public ECParams GenerateParameters(string curveName)

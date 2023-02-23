@@ -122,23 +122,23 @@ namespace UProveParams
                 // prints out point according to SEC spec
                 writer.WriteLine(String.Format(CodeVariablePrefix, varType, varNamespace, varLabel));
                 writer.WriteLine("0x04,"); // point prefix
-                WriteSplitHexString(point.X.ToBigInteger().ToString(16));
+                WriteSplitHexString(point.XCoord.ToBigInteger().ToString(16));
                 writer.WriteLine(",");
-                WriteSplitHexString(point.Y.ToBigInteger().ToString(16));
+                WriteSplitHexString(point.YCoord.ToBigInteger().ToString(16));
                 writer.WriteLine(CodeVariableSuffix);
             }
             if (type == Type.codeCSharp)
             {
                 writer.WriteLine(CodeLabelPrefix + varLabel + ((counter >= 0) ? " (counter = " + counter + ")" : ""));
-                PrintPointCoordinate(varLabel, varType, varNamespace, point.X, "_x");
-                PrintPointCoordinate(varLabel, varType, varNamespace, point.Y, "_y");
+                PrintPointCoordinate(varLabel, varType, varNamespace, point.XCoord, "_x");
+                PrintPointCoordinate(varLabel, varType, varNamespace, point.YCoord, "_y");
                 writer.WriteLine();
             }
             else if (type == Type.doc)
             {
                 //writer.WriteLine(label);
-                writer.WriteLine(varLabel + ".x = " + point.X.ToBigInteger().ToString(16));
-                writer.WriteLine(varLabel + ".y = " + point.Y.ToBigInteger().ToString(16));
+                writer.WriteLine(varLabel + ".x = " + point.XCoord.ToBigInteger().ToString(16));
+                writer.WriteLine(varLabel + ".y = " + point.YCoord.ToBigInteger().ToString(16));
                 if (counter >= 0) { writer.WriteLine("counter = " + counter); }
             }
         }
@@ -148,15 +148,15 @@ namespace UProveParams
             int counter = 0;
             if (hexString.Length % 2 == 1)
             {
-                // odd lenght, prepend a 0
+                // odd length, prepend a 0
                 hexString = "0" + hexString;
             }
-            int hexStringLenght = hexString.Length / 2;
-            for (int i = 0; i < hexStringLenght; i++)
+            int hexStringLength = hexString.Length / 2;
+            for (int i = 0; i < hexStringLength; i++)
             {
                 writer.Write("0x" + hexString.Substring(i * 2, 2));
                 counter = (counter + 1) % 8;
-                if (i == (hexStringLenght - 1))
+                if (i == (hexStringLength - 1))
                 {
                     // last hex char
                     writer.WriteLine();

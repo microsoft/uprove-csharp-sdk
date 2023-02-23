@@ -26,7 +26,7 @@ using UProveCrypto.Math;
 namespace UProveUnitTest
 {
     [TestClass]
-    [DeploymentItem(@"SerializationReference\", "SerializationReference")]
+    [DeploymentItem(@"..\..\..\SerializationReference\", "SerializationReference")]
     public class SerializationTest
     {
         static bool CREATE_SERIALIZATION_TEST_FILES = false;
@@ -56,10 +56,11 @@ namespace UProveUnitTest
         }
 
 
-        
+
         [TestMethod]
         public void TestSerialization()
         {
+            Console.WriteLine("TestSerialization");
 
             // Create IssuerSetupParameters
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
@@ -84,7 +85,7 @@ namespace UProveUnitTest
                                 p,
                                 q,
                                 g,
-                                null, 
+                                null,
                                 null);
                             isp.UidH = "SHA1";
                         }
@@ -182,20 +183,26 @@ namespace UProveUnitTest
         [TestMethod]
         public void TestSerializationReference()
         {
-
+            Console.WriteLine("TestSerializationReference");
             // Create IssuerSetupParameters
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
             foreach (string fileName in Directory.GetFiles("SerializationReference"))
             {
                 FileStream f = File.OpenRead(fileName);
-                BinaryFormatter bf = new BinaryFormatter();
-                object[] parameters = (object[]) bf.Deserialize(f);
-                f.Close();
+                BinaryReader br = new BinaryReader(f);
+                //BinaryFormatter bf = new BinaryFormatter();
+                //object[] parameters = (object[]) bf.Deserialize(f);
 
-                bool useCustomGroup = (bool) parameters[0];
-                bool useSubgroupConstruction = (bool) parameters[1];
-                string typeName = (string)parameters[2];
-                string json = (string)parameters[3];
+                bool useCustomGroup = (bool)br.ReadBoolean();//  parameters[0];
+                bool useSubgroupConstruction = (bool)br.ReadBoolean();
+                string typeName = (string)br.ReadString();
+                string json = (string)br.ReadString();
+
+                Console.WriteLine("====================================");
+
+                Console.WriteLine(typeName);
+
+                f.Close();
 
                 IssuerSetupParameters isp = new IssuerSetupParameters();
                 if (useSubgroupConstruction)
@@ -290,8 +297,8 @@ namespace UProveUnitTest
 
         [TestMethod]
         public void TestSerializationErrors()
-        { 
-            string ipJson = 
+        {
+            string ipJson =
                 @"{""uidp"":""aHR0cDovL2lzc3Vlci91cHJvdmUvaXNzdWVycGFyYW1zL3NvZnR3YXJl"",
                    ""descGq"":{
                       ""type"":""sg"",
@@ -345,7 +352,7 @@ namespace UProveUnitTest
             TestError<FirstIssuanceMessage>(ip, RemoveValue(message1, "sz"), "FirstIssuanceMessage:sz");
             TestError<FirstIssuanceMessage>(ip, RemoveArrayValue(message1, "sa"), "FirstIssuanceMessage:sa");
             TestError<FirstIssuanceMessage>(ip, RemoveArrayValue(message1, "sb"), "FirstIssuanceMessage:sb");
-            
+
             string message2 = "{\"sc\":[\"LH+f1uiiftJmIdnG\\/J4KpewQ+g8=\",\"bNwhXE4QksTwTu644oquCxod7hQ=\",\"1jeLI4Mp70sRQ77rX6El2lJYcyI=\",\"z68c60h+c3FXadIHtxzfCE6zn1A=\",\"uxsN8PgR+K985feVRXZkFvGJBo8=\"]}";
 
             TestError<SecondIssuanceMessage>(ip, RemoveArrayValue(message2, "sc"), "SecondIssuanceMessage:sc");
@@ -385,7 +392,7 @@ namespace UProveUnitTest
 
 
         public string RemoveValue(string json, string value)
-        { 
+        {
             // removes a value  "value":"somedata"
             string pattern = "\"" + value + @"\s*""\s*:\s*""[^""]+""\s*,?";
             return System.Text.RegularExpressions.Regex.Replace(json, pattern, "");
@@ -429,7 +436,7 @@ namespace UProveUnitTest
             }
 
             // also remove a trailing comma
-            if (i+1 < json.Length && json[i + 1] == ',')
+            if (i + 1 < json.Length && json[i + 1] == ',')
                 i++;
 
             return json.Remove(start, i - start + 1);
@@ -502,15 +509,13 @@ namespace UProveUnitTest
 
         private void WriteSerializationTestFile<T>(bool useCustomGroup, bool useSubgroupConstruction, string json, T obj)
         {
-            FileStream fs = File.Open(Path.GetRandomFileName() + ".dat", FileMode.Create);
+            FileStream fs = File.Open("../../../SerializationReference/" + Path.GetRandomFileName() + ".dat", FileMode.Create);
 
-            BinaryFormatter bf = new BinaryFormatter();
-            object[] objects = new object[4];
-            objects[0] = useCustomGroup;
-            objects[1] = useSubgroupConstruction;
-            objects[2] = obj.GetType().FullName;
-            objects[3] = json;
-            bf.Serialize(fs, objects);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(useCustomGroup);
+            bw.Write(useSubgroupConstruction);
+            bw.Write(obj.GetType().FullName);
+            bw.Write(json);
 
             fs.Close();
         }
@@ -551,7 +556,7 @@ namespace UProveUnitTest
 
             for (int i = 0; i < array1.Length; i++)
             {
-                
+
                 if (array1[i].Equals(array2[i]) == false)
                     return false;
 
@@ -565,7 +570,7 @@ namespace UProveUnitTest
             if (field1 == null & field2 == null)
                 return true;
 
-            if (field1 == null & field2 != null) 
+            if (field1 == null & field2 != null)
                 return false;
 
             if (field1 != null & field2 == null)
@@ -575,7 +580,7 @@ namespace UProveUnitTest
             if (Object.ReferenceEquals(field1, field2))
                 return true;
 
-             return field1.Equals(field2);
+            return field1.Equals(field2);
         }
 
         public static bool Verify(IssuerParameters ip1, object obj)
