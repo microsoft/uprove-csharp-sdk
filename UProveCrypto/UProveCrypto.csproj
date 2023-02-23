@@ -1,46 +1,69 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Library</OutputType>
+    <!-- <OutputType>Library</OutputType> -->
+    
+    <!-- These are source-control entries that say refer to the solution-file
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProvider>SAK</SccProvider> 
+    -->
+
+    <!-- suppress : warning CS1591: Missing XML comment for publicly visible type or member -->
     <NoWarn>1591</NoWarn>
+
+    <!-- 
+      do not auto-generate \obj\Debug\net7.0\UProveCrypto.AssemblyInfo.cs as it will duplicate 
+      entries in \Properties\AssemblyInfo.cs
+    -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;BOUNCY_CASTLE</DefineConstants>
     <DocumentationFile>bin\Debug\UProveCrypto.XML</DocumentationFile>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DefineConstants>TRACE;BOUNCY_CASTLE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup>
+  
+  <!-- <PropertyGroup>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
+  </PropertyGroup> -->
+  <!-- <PropertyGroup>
     <DelaySign>true</DelaySign>
-  </PropertyGroup>
+  </PropertyGroup> -->
   <!-- <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Security" />
   </ItemGroup> -->
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Compile Include="..\Version.cs">
       <Link>Version.cs</Link>
     </Compile>
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\BouncyCastle\bc-trimmed\bc-trimmed.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
+    <!-- <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    </PackageReference> -->
   </ItemGroup>
 </Project>
+
+<!-- <Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project> -->
