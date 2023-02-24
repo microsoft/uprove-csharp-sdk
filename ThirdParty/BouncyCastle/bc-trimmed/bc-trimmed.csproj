@@ -3,10 +3,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>bc_trimmed</RootNamespace>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
