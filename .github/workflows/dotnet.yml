@@ -8,7 +8,8 @@ on:
     branches: [ "dotnet-7-vs-code-migration" ]
   pull_request:
     branches: [ "dotnet-7-vs-code-migration" ]
-
+  workflow_dispatch:
+  
 jobs:
   build:
 
