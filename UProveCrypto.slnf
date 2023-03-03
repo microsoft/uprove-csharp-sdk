@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "UProveCrypto.sln",
+    "projects": [
+      "ThirdParty\\BouncyCastle\\bc-trimmed\\bc-trimmed.csproj",
+      "UProveCrypto\\UProveCrypto.csproj",
+      "UProveSample\\UProveSample.csproj",
+      "UProveUnitTest\\UProveUnitTest.csproj"
+    ]
+  }
+}

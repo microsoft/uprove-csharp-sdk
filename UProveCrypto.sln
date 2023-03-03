@@ -2,22 +2,22 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33414.496
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveUnitTest", "UProveUnitTest\UProveUnitTest.csproj", "{61263EB0-5263-4FDA-BEC8-CC1403B973CF}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveCrypto", "UProveCrypto\UProveCrypto.csproj", "{3C8F664A-B85A-4F53-87D9-AC3354085ED0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveSample", "UProveSample\UProveSample.csproj", "{46E74C02-29FB-4EBB-945A-98DAD73AC1A8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveUnitTest", "UProveUnitTest\UProveUnitTest.csproj", "{61263EB0-5263-4FDA-BEC8-CC1403B973CF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "bc-trimmed", "ThirdParty\BouncyCastle\bc-trimmed\bc-trimmed.csproj", "{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}"
-EndProject
+# Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "bc-trimmed", "ThirdParty\BouncyCastle\bc-trimmed\bc-trimmed.csproj", "{E6F1B45A-7EF6-4620-A8AE-2F74AB1A5489}"
+# EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveParams", "UProveParams\UProveParams.csproj", "{A60D1870-B799-4813-A491-C56D6C5AAFC9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UProveTestVectors", "UProveTestVectors\UProveTestVectors.csproj", "{6D1FA73C-266E-40FB-AA10-FE6B09DB69DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{3C8F664A-B85A-4F53-87D9-AC3354085ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
