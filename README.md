@@ -28,7 +28,7 @@ For more information about U-Prove, visit http://www.microsoft.com/u-prove.
 <br>
 
 ## REQUIREMENTS
-- .NET SDK 7.0.x &nbsp;&nbsp;  https://dotnet.microsoft.com/en-us/download/dotnet/7.0
+- .NET SDK 6.0.x or 7.0.x &nbsp;&nbsp;  https://dotnet.microsoft.com/en-us/download/dotnet/6.0
 - C#
 
 <br>
@@ -42,7 +42,7 @@ Open the solution file (UProveCrypto.sln) in Visual Studio 2022 and select __Bui
 Open the project folder with VS Code. Select the __Terminal__ menu; select __Run Build Task...__ (Ctrl+Shift+b)_ to perform a build. For a Debug build, select the __Terminal__ menu; select __Run Task...__; select __build Debug__ from the command menu.
 
 #### Command Line
-One a command line with __dotnet__ (7.0.x) available, run `dotnet build`. You can specifiy the build config with the additional `-c Debug` or `-c Release` parameters.
+One a command line with __dotnet__ (6.0.x+) available, run `dotnet build`. You can specifiy the build config with the additional `-c Debug` or `-c Release` parameters.
 
 <br>
 
@@ -70,7 +70,7 @@ time to complete.
 Select the __Terminal__ menu; select __Run Task...__; select __test__ from the command menu.
 
 #### Command Line
-One a command line with __dotnet__ (7.0.x) available, run `dotnet test -v n`. 
+One a command line with __dotnet__ (6.0.x) available, run `dotnet test -v n`. 
 
 <br>
 
