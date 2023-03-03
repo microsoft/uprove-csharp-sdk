@@ -5,15 +5,15 @@ name: .NET
 
 on:
   push:
-    branches: [ "dotnet-7-vs-code-migration" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "dotnet-7-vs-code-migration" ]
+    branches: [ "master" ]
   workflow_dispatch:
   
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
