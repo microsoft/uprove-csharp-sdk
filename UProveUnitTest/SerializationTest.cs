@@ -190,17 +190,11 @@ namespace UProveUnitTest
             {
                 FileStream f = File.OpenRead(fileName);
                 BinaryReader br = new BinaryReader(f);
-                //BinaryFormatter bf = new BinaryFormatter();
-                //object[] parameters = (object[]) bf.Deserialize(f);
 
                 bool useCustomGroup = (bool)br.ReadBoolean();//  parameters[0];
                 bool useSubgroupConstruction = (bool)br.ReadBoolean();
                 string typeName = (string)br.ReadString();
                 string json = (string)br.ReadString();
-
-                Console.WriteLine("====================================");
-
-                Console.WriteLine(typeName);
 
                 f.Close();
 
