@@ -26,7 +26,7 @@ using UProveCrypto.Math;
 namespace UProveUnitTest
 {
     [TestClass]
-    [DeploymentItem(@"..\..\..\SerializationReference\", "SerializationReference")]
+    [DeploymentItem(@"../../../SerializationReference", "SerializationReference")]
     public class SerializationTest
     {
         static bool CREATE_SERIALIZATION_TEST_FILES = false;

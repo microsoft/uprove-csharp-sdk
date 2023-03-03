@@ -39,7 +39,7 @@ using UProveCrypto.PolyProof;
 namespace UProveCryptoTest
 {
     [TestClass]
-    [DeploymentItem(@"..\..\..\TestVectorData\", "TestVectorData")]
+    [DeploymentItem(@"../../../TestVectorData", "TestVectorData")]
 
     public class TestVectorsTest
     {
@@ -207,7 +207,7 @@ namespace UProveCryptoTest
                     {
                         foreach (bool isLite in bools)
                         {
-                            string filename = "TestVectorData\\testvectors_";
+                            string filename = "TestVectorData/testvectors_";
                             if (isSubgroupConstruction)
                             {
                                 filename += "SG";
