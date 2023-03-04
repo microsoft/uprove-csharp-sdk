@@ -243,7 +243,7 @@ namespace UProveTestVectors
             else if (group is P256ECGroup)
             {
                 int finalCounter;
-                var curve = (((((group as P256ECGroup).Identity) as ECElement).point as ECPoint).Curve as FpCurve);
+                var curve = (((((group as P256ECGroup).Identity) as ECElement).point as Org.BouncyCastle.Math.EC.ECPoint).Curve as FpCurve);
                 return new ECElement(ECRecommendedParameters.GetRandomPoint(Encoding.UTF8.GetString(scope), curve, pseudonymIndex, formater, out finalCounter));
             }
             else

@@ -41,13 +41,13 @@ namespace UProveCrypto
         public byte[][] Attributes { get; set; }           
         /// the token information field for the new token
         public byte[] TI { get; set; }
-        /// indicies of committed attributes (in new token)
+        /// indices of committed attributes (in new token)
         public int[] C { get; set; }
-        /// indicies of committed attributes (in old token(s))
+        /// indices of committed attributes (in old token(s))
         public int[] Corig { get; set; }
         /// flag indicating that there are carry-over attributes in the proof
         public bool HasCarryOverAttributes { get; set; }
-        /// private attributes known only to the prover (must have ip.e[U[i]] == 0 (not hahsed) for all i)
+        /// private attributes known only to the prover (must have ip.e[U[i]] == 0 (not hashed) for all i)
         public int[] U { get; set; }
         /// attributes known to both the prover and issuer
         public int[] K { get; set; }
@@ -177,7 +177,7 @@ namespace UProveCrypto
             }
             if (sourceIndex.Length != destinationIndex.Length)
             {
-                throw new ArgumentException("sourceIndex and destinationIndex must have the same lenght");
+                throw new ArgumentException("sourceIndex and destinationIndex must have the same length");
             }
             if (!sourceKeyAndToken.Token.Uidp.SequenceEqual<byte>(sourceIP.UidP))
             {
@@ -247,7 +247,7 @@ namespace UProveCrypto
             }
             if (sourceIndex.Length != destinationIndex.Length)
             {
-                throw new ArgumentException("sourceIndex and destinationIndex must have the same lenght");
+                throw new ArgumentException("sourceIndex and destinationIndex must have the same length");
             }
             if (!sourceToken.Uidp.SequenceEqual<byte>(sourceIP.UidP))
             {
@@ -315,7 +315,7 @@ namespace UProveCrypto
         /// <returns></returns>
         public static PreIssuanceProof CreateProof(ProverPreIssuanceParameters pipp, out FieldZqElement beta0, byte[] message)
         {
-            // validate paramters first
+            // validate parameters first
             pipp.Validate();
 
             bool supportDevice = (pipp.DevicePublicKey == null) ? false : true;
@@ -450,7 +450,7 @@ namespace UProveCrypto
         /// <exception cref="InvalidUProveArtifactException">Thrown if the proof is invalid.</exception>
         public static GroupElement VerifyProof(IssuerPreIssuanceParameters ipip, PreIssuanceProof proof, byte[] message)
         {
-            // Validate paramters first
+            // Validate parameters first
             ipip.Validate();
 
             IssuerParameters ip = ipip.IP;
@@ -569,7 +569,7 @@ namespace UProveCrypto
 
         /// <summary>
         /// Returns the blinded gamma value created during this pre-issuance proof. 
-        /// The Prover will typically call this method to retrive the blinded gamma
+        /// The Prover will typically call this method to retrieve the blinded gamma
         /// value from this PreIssuanceProof. 
         /// The Issuer should not use this method to access the blinded gamma value,
         /// since the proof must be verified, and VerifyProof returns this value 
@@ -642,7 +642,7 @@ namespace UProveCrypto
             _CGamma = CGamma.ToBase64String();
             _Ch0 = Ch0.ToBase64String();
             _c = c.ToBase64String();
-            // Serialize the responses dictionary.  TODO: if FieldZqElement was serializable, then this wouldn't be necessary, since Dictionary knows how to serializae itself proivded the keys and values are serializable. 
+            // Serialize the responses dictionary.  TODO: if FieldZqElement was serializable, then this wouldn't be necessary, since Dictionary knows how to serialize itself provided the keys and values are serializable. 
             _responses_keys = new string[responses.Count];
             _responses_values = new string[responses.Count];
 

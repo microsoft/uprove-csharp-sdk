@@ -27,7 +27,7 @@ namespace UProveTestVectors
         {
             string UIDh = "SHA-256";
             formater.PrintText("UIDh", null, null, UIDh);
-            HashAlgorithm hash = HashAlgorithm.Create(UIDh);
+            HashAlgorithm hash = System.Security.Cryptography.SHA256.Create();            
 
             byte[] hash_byte = ProtocolHelper.HashToBytes(hash, new object[] { (byte)1 });
             formater.PrintHex("hash_byte (0x01)", null, null, hash_byte);
@@ -72,7 +72,7 @@ namespace UProveTestVectors
             //
             string UIDh = "SHA-256";
             formater.PrintText("UIDh", UIDh);
-            HashAlgorithm hash = HashAlgorithm.Create(UIDh);
+            HashAlgorithm hash = System.Security.Cryptography.SHA256.Create();
 
             //
             // Setup

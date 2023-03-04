@@ -1468,6 +1468,7 @@ namespace BouncyCastle
         public override bool Equals(
             object obj)
         {
+            #pragma warning disable 0252
             if (obj == this)
                 return true;
 

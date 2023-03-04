@@ -70,13 +70,38 @@ namespace UProveCrypto
                 hash = null;
             }
 #else
-            hash = HashAlgorithm.Create(hashAlgorithm);
-#endif // SILVERLIGHT
-#endif // NETFX_CORE
-            if (hash == null)
+            hash = System.Security.Cryptography.SHA256.Create(); //HashAlgorithm.Create(hashAlgorithm);
+
+            switch (hashAlgorithm.ToUpper().Replace("-", ""))
             {
+                case "SHA1":
+                    hash = System.Security.Cryptography.SHA1.Create();
+                    break;
+
+                case "SHA256":
+                    hash = System.Security.Cryptography.SHA256.Create();
+                    break;
+
+                case "SHA384":
+                    hash = System.Security.Cryptography.SHA384.Create();
+                    break;
+
+                case "SHA512":
+                    hash = System.Security.Cryptography.SHA512.Create();
+                    break;
+
+                default:
                 throw new ArgumentException("Unsupported hash algorithm: " + hashAlgorithm);
             }
+
+
+
+#endif // SILVERLIGHT
+#endif // NETFX_CORE
+            // if (hash == null)
+            // {
+            //     throw new ArgumentException("Unsupported hash algorithm: " + hashAlgorithm);
+            // }
         }
 
         private void HashInternal(byte[] value)
@@ -262,7 +287,7 @@ namespace UProveCrypto
         /// </summary>
         public void HashNull()
         {
-            Hash((int) 0);
+            Hash((int)0);
         }
 
         /// <summary>
@@ -278,7 +303,8 @@ namespace UProveCrypto
         /// </summary>
         public byte[] Digest
         {
-            get {
+            get
+            {
                 if (digest == null)
                 {
 #if NETFX_CORE
