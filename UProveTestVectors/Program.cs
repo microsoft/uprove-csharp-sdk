@@ -21,7 +21,7 @@ namespace UProveTestVectors
     {
         static readonly bool[] booleans = new bool[] { false, true };
 
-        static readonly string SpecVersion = "V1.1 Revision 3";
+        static readonly string SpecVersion = "V1.1 Revision 5";
         static readonly string FileHeader = "// U-Prove Cryptographic test vectors - " + SpecVersion;
         /// <summary>
         /// Generates the test vectors for multiple protocol variations.
@@ -64,50 +64,46 @@ namespace UProveTestVectors
                 // iterate for software-only and device-bound tokens
                 foreach (bool supportDevice in booleans)
                 {
-                    // iterate for subgroup and ECC group constructions
-                    foreach (bool subgroup in booleans) 
+                    // iterate for lite and full protocol versions
+                    foreach (bool lite in booleans) 
                     {
-                        // iterate for lite and full protocol versions
-                        foreach (bool lite in booleans) 
+                        // iterate for various disclosed attributes subsets
+                        foreach (int[] D in new int[][] {
+                                                    new int[] {},
+                                                    new int[] { 2, 5 },
+                                                    new int[] { 1, 2, 3, 4, 5} })
                         {
-                            // iterate for various disclosed attributes subsets
-                            foreach (int[] D in new int[][] {
-                                                        new int[] {},
-                                                        new int[] { 2, 5 },
-                                                        new int[] { 1, 2, 3, 4, 5} })
+                            // print vectors as a text file
+                            Formatter.Type formatterType = Formatter.Type.doc;
+                            outputFile = Path.Combine(outputPath, "testvectors_EC" + (supportDevice ? "_Device" : "") + ("_D" + D.Length) + (lite ? "_lite" : "") + "_" + formatterType + ".txt");
+                            Console.WriteLine("Generating " + outputFile);
+                            try
                             {
-                                // print vectors as a text file
-                                Formatter.Type formatterType = Formatter.Type.doc;
-                                outputFile = Path.Combine(outputPath, "testvectors" + (subgroup ? "_SG" : "_EC") + (supportDevice ? "_Device" : "") + ("_D" + D.Length) + (lite ? "_lite" : "") + "_" + formatterType + ".txt");
-                                Console.WriteLine("Generating " + outputFile);
-                                try
+                                writer = new System.IO.StreamWriter(outputFile);
+                                formatter = new Formatter(formatterType, writer);
+                                formatter.PrintText(FileHeader);
+                                formatter.PrintText("// The following prefixes identify values for U-Prove extensions:");
+                                formatter.PrintText("// * 'ie_': identity escrow extension - draft revision 1");
+                                formatter.PrintText("// * 'r_': designated-verifier accumulator revocation extension - draft revision 2");
+                                formatter.PrintText("// * 'sm_': set membership extension - draft revision 1");
+                                string uidp = SpecVersion + "Test Vectors #" + uidpIndex++;
+                                TestVectors.GenerateTestVectors(uidp, formatter, supportDevice, lite, 5, D);
+                            }
+                            catch (Exception e)
+                            {
+                                var color = Console.ForegroundColor;
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(e.Message);
+                                Console.WriteLine(e.StackTrace);
+                                Console.ForegroundColor = color;
+                            }
+                            finally
+                            {
+                                if (writer != null)
                                 {
-                                    writer = new System.IO.StreamWriter(outputFile);
-                                    formatter = new Formatter(formatterType, writer);
-                                    formatter.PrintText(FileHeader);
-                                    formatter.PrintText("// The following prefixes identify values for U-Prove extensions:");
-                                    formatter.PrintText("// * 'ie_': identity escrow extension - draft revision 1");
-                                    formatter.PrintText("// * 'r_': designated-verifier accumulator revocation extension - draft revision 2");
-                                    formatter.PrintText("// * 'sm_': set membership extension - draft revision 1");
-                                    string uidp = SpecVersion + "Test Vectors #" + uidpIndex++;
-                                    TestVectors.GenerateTestVectors(uidp, formatter, subgroup, supportDevice, lite, 5, D);
+                                    writer.Close();
                                 }
-                                catch (Exception e)
-                                {
-                                    var color = Console.ForegroundColor;
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine(e.Message);
-                                    Console.WriteLine(e.StackTrace);
-                                    Console.ForegroundColor = color;
-                                }
-                                finally
-                                {
-                                    if (writer != null)
-                                    {
-                                        writer.Close();
-                                    }
-                                    writer = null;
-                                }
+                                writer = null;
                             }
                         }
                     }

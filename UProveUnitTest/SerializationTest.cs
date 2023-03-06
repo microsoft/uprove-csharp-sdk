@@ -67,116 +67,92 @@ namespace UProveUnitTest
 
             for (int i = 0; i <= 1; i++)
             {
-                for (int j = 0; j <= 1; j++)
+                bool useCustomGroup = (i == 0);
+
+                IssuerSetupParameters isp = new IssuerSetupParameters();
+                isp.GroupConstruction = GroupType.ECC;
+                if (useCustomGroup)
                 {
-                    bool useCustomGroup = (i == 0);
-                    bool useSubgroupConstruction = (j == 0);
-
-                    IssuerSetupParameters isp = new IssuerSetupParameters();
-                    if (useSubgroupConstruction)
-                    {
-                        isp.GroupConstruction = GroupType.Subgroup;
-                        if (useCustomGroup)
-                        {
-                            byte[] p = HexToBytes("d21ae8d66e6c6b3ced0eb3df1a26c91bdeed013c17d849d30ec309813e4d3799f26db0d494e82ec61ea9fdc70bb5cbcaf2e5f18a836494f58e67c6d616480c37a7f2306101fc9f0f4768f9c9793c2be176b0b7c979b4065d3e835686a3f0b8420c6834cb17930386dedab2b07dd473449a48baab316286b421052475d134cd3b");
-                            byte[] q = HexToBytes("fff80ae19daebc61f46356af0935dc0e81148eb1");
-                            byte[] g = HexToBytes("abcec972e9a9dd8d133270cfeac26f726e567d964757630d6bd43460d0923a46aec0ace255ebf3ddd4b1c4264f53e68b361afb777a13cf0067dae364a34d55a0965a6cccf78852782923813cf8708834d91f6557d783ec75b5f37cd9185f027b042c1c72e121b1266a408be0bb7270d65917b69083633e1f3cd60624612fc8c1");
-                            isp.Gq = SubgroupGroup.CreateSubgroupGroup(
-                                p,
-                                q,
-                                g,
-                                null,
-                                null);
-                            isp.UidH = "SHA1";
-                        }
-                    }
-                    else
-                    {
-                        isp.GroupConstruction = GroupType.ECC;
-                        if (useCustomGroup)
-                        {
-                            continue;
-                        }
-                    }
-
-                    isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
-                    isp.E = IssuerSetupParameters.GetDefaultEValues(3);
-                    isp.S = encoding.GetBytes("application-specific specification");
-
-                    // Generate IssuerKeyAndParameters
-                    IssuerKeyAndParameters ikap = isp.Generate();
-
-                    // Create an IssuerParameters
-                    IssuerParameters ip = ikap.IssuerParameters;
-
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, ikap);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, ikap.IssuerParameters);
-
-                    // specify the attribute values
-                    byte[][] attributes = new byte[][] {
-                    encoding.GetBytes("first attribute value"),
-                    encoding.GetBytes("second attribute value"),
-                    encoding.GetBytes("third attribute value")   };
-
-                    // specify the special field values
-                    byte[] tokenInformation = encoding.GetBytes("token information value");
-                    byte[] proverInformation = encoding.GetBytes("prover information value");
-
-                    // specify the number of tokens to issue
-                    int numberOfTokens = 5;
-
-                    // setup the issuer and generate the first issuance message
-                    IssuerProtocolParameters ipp = new IssuerProtocolParameters(ikap);
-                    ipp.Attributes = attributes;
-                    ipp.NumberOfTokens = numberOfTokens;
-                    ipp.TokenInformation = tokenInformation;
-                    Issuer issuer = ipp.CreateIssuer();
-                    FirstIssuanceMessage firstMessage = issuer.GenerateFirstMessage();
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, firstMessage);
-
-                    // setup the prover and generate the second issuance message
-                    Prover prover = new Prover(ip, numberOfTokens, attributes, tokenInformation, proverInformation, null);
-                    SecondIssuanceMessage secondMessage = prover.GenerateSecondMessage(firstMessage);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, secondMessage);
-
-                    // generate the third issuance message
-                    ThirdIssuanceMessage thirdMessage = issuer.GenerateThirdMessage(secondMessage);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, thirdMessage);
-
-                    // generate the tokens
-                    UProveKeyAndToken[] upkt = prover.GenerateTokens(thirdMessage);
-
-                    for (int k = 0; k < upkt.Length; k++)
-                    {
-                        string json = ip.Serialize(upkt[k]);
-                        UProveKeyAndToken upkt_fromJson = ip.Deserialize<UProveKeyAndToken>(json);
-                        Assert.IsTrue(Verify(upkt[k], upkt_fromJson));
-                    }
-
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, upkt[0].Token);
-
-                    /*
-                     *  token presentation
-                     */
-                    // the indices of disclosed attributes
-                    int[] disclosed = new int[] { 2 };
-                    // the indices of committed attributes
-                    int[] committed = new int[] { 3 };
-                    // the returned commitment randomizers, to be used by an external proof module
-                    FieldZqElement[] tildeO;
-                    // the application-specific message that the prover will sign. Typically this is a nonce combined
-                    // with any application-specific transaction data to be signed.
-                    byte[] message = encoding.GetBytes("message");
-                    // the application-specific verifier scope from which a scope-exclusive pseudonym will be created
-                    // (if null, then a pseudonym will not be presented)
-                    byte[] scope = encoding.GetBytes("verifier scope");
-                    // generate the presentation proof
-                    PresentationProof proof = PresentationProof.Generate(ip, disclosed, committed, 1, scope, message, null, null, upkt[0], attributes, out tildeO);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, proof);
-
-                    // verify the presentation proof
-                    proof.Verify(ip, disclosed, committed, 1, scope, message, null, upkt[0].Token);
+                    continue;
                 }
+
+                isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
+                isp.E = IssuerSetupParameters.GetDefaultEValues(3);
+                isp.S = encoding.GetBytes("application-specific specification");
+
+                // Generate IssuerKeyAndParameters
+                IssuerKeyAndParameters ikap = isp.Generate();
+
+                // Create an IssuerParameters
+                IssuerParameters ip = ikap.IssuerParameters;
+
+                VerifySerialization(useCustomGroup, ip, ikap);
+                VerifySerialization(useCustomGroup, ip, ikap.IssuerParameters);
+
+                // specify the attribute values
+                byte[][] attributes = new byte[][] {
+                encoding.GetBytes("first attribute value"),
+                encoding.GetBytes("second attribute value"),
+                encoding.GetBytes("third attribute value")   };
+
+                // specify the special field values
+                byte[] tokenInformation = encoding.GetBytes("token information value");
+                byte[] proverInformation = encoding.GetBytes("prover information value");
+
+                // specify the number of tokens to issue
+                int numberOfTokens = 5;
+
+                // setup the issuer and generate the first issuance message
+                IssuerProtocolParameters ipp = new IssuerProtocolParameters(ikap);
+                ipp.Attributes = attributes;
+                ipp.NumberOfTokens = numberOfTokens;
+                ipp.TokenInformation = tokenInformation;
+                Issuer issuer = ipp.CreateIssuer();
+                FirstIssuanceMessage firstMessage = issuer.GenerateFirstMessage();
+                VerifySerialization(useCustomGroup, ip, firstMessage);
+
+                // setup the prover and generate the second issuance message
+                Prover prover = new Prover(ip, numberOfTokens, attributes, tokenInformation, proverInformation, null);
+                SecondIssuanceMessage secondMessage = prover.GenerateSecondMessage(firstMessage);
+                VerifySerialization(useCustomGroup, ip, secondMessage);
+
+                // generate the third issuance message
+                ThirdIssuanceMessage thirdMessage = issuer.GenerateThirdMessage(secondMessage);
+                VerifySerialization(useCustomGroup, ip, thirdMessage);
+
+                // generate the tokens
+                UProveKeyAndToken[] upkt = prover.GenerateTokens(thirdMessage);
+
+                for (int k = 0; k < upkt.Length; k++)
+                {
+                    string json = ip.Serialize(upkt[k]);
+                    UProveKeyAndToken upkt_fromJson = ip.Deserialize<UProveKeyAndToken>(json);
+                    Assert.IsTrue(Verify(upkt[k], upkt_fromJson));
+                }
+
+                VerifySerialization(useCustomGroup, ip, upkt[0].Token);
+
+                /*
+                    *  token presentation
+                    */
+                // the indices of disclosed attributes
+                int[] disclosed = new int[] { 2 };
+                // the indices of committed attributes
+                int[] committed = new int[] { 3 };
+                // the returned commitment randomizers, to be used by an external proof module
+                FieldZqElement[] tildeO;
+                // the application-specific message that the prover will sign. Typically this is a nonce combined
+                // with any application-specific transaction data to be signed.
+                byte[] message = encoding.GetBytes("message");
+                // the application-specific verifier scope from which a scope-exclusive pseudonym will be created
+                // (if null, then a pseudonym will not be presented)
+                byte[] scope = encoding.GetBytes("verifier scope");
+                // generate the presentation proof
+                PresentationProof proof = PresentationProof.Generate(ip, disclosed, committed, 1, scope, message, null, null, upkt[0], attributes, out tildeO);
+                VerifySerialization(useCustomGroup, ip, proof);
+
+                // verify the presentation proof
+                proof.Verify(ip, disclosed, committed, 1, scope, message, null, upkt[0].Token);
             }
 
         }
@@ -192,37 +168,26 @@ namespace UProveUnitTest
                 BinaryReader br = new BinaryReader(f);
 
                 bool useCustomGroup = (bool)br.ReadBoolean();//  parameters[0];
+                // TODO: delete from here ----
+                // TODO: current test files contain a group boolean; we don't need that anymore since deprecating
+                // the subgroup construction. We need to delete the ones corresponding to the deprecated constructions.
                 bool useSubgroupConstruction = (bool)br.ReadBoolean();
+                if (useSubgroupConstruction)
+                {
+                    Console.WriteLine("Delete subgroup test file: " + fileName);
+                    continue;
+                }
+                // TODO: ---- until here
                 string typeName = (string)br.ReadString();
                 string json = (string)br.ReadString();
 
                 f.Close();
 
                 IssuerSetupParameters isp = new IssuerSetupParameters();
-                if (useSubgroupConstruction)
+                isp.GroupConstruction = GroupType.ECC;
+                if (useCustomGroup)
                 {
-                    isp.GroupConstruction = GroupType.Subgroup;
-                    if (useCustomGroup)
-                    {
-                        byte[] p = HexToBytes("d21ae8d66e6c6b3ced0eb3df1a26c91bdeed013c17d849d30ec309813e4d3799f26db0d494e82ec61ea9fdc70bb5cbcaf2e5f18a836494f58e67c6d616480c37a7f2306101fc9f0f4768f9c9793c2be176b0b7c979b4065d3e835686a3f0b8420c6834cb17930386dedab2b07dd473449a48baab316286b421052475d134cd3b");
-                        byte[] q = HexToBytes("fff80ae19daebc61f46356af0935dc0e81148eb1");
-                        byte[] g = HexToBytes("abcec972e9a9dd8d133270cfeac26f726e567d964757630d6bd43460d0923a46aec0ace255ebf3ddd4b1c4264f53e68b361afb777a13cf0067dae364a34d55a0965a6cccf78852782923813cf8708834d91f6557d783ec75b5f37cd9185f027b042c1c72e121b1266a408be0bb7270d65917b69083633e1f3cd60624612fc8c1");
-                        isp.Gq = SubgroupGroup.CreateSubgroupGroup(
-                            p,
-                            q,
-                            g,
-                            null,
-                            null);
-                        isp.UidH = "SHA1";
-                    }
-                }
-                else
-                {
-                    isp.GroupConstruction = GroupType.ECC;
-                    if (useCustomGroup)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
@@ -436,13 +401,13 @@ namespace UProveUnitTest
             return json.Remove(start, i - start + 1);
         }
 
-        public void VerifySerialization<T>(bool useCustomGroup, bool useSubroupConstruction, IssuerParameters ip, T obj) where T : IParametrizedDeserialization
+        public void VerifySerialization<T>(bool useCustomGroup, IssuerParameters ip, T obj) where T : IParametrizedDeserialization
         {
             // serialize the object to json string
             string json = ip.Serialize(obj);
 
             if (CREATE_SERIALIZATION_TEST_FILES)
-                WriteSerializationTestFile(useCustomGroup, useSubroupConstruction, json, obj);
+                WriteSerializationTestFile(useCustomGroup, json, obj);
 
             // output the serialization string
             Debug.WriteLine(typeof(T).Name);
@@ -501,13 +466,12 @@ namespace UProveUnitTest
 
         }
 
-        private void WriteSerializationTestFile<T>(bool useCustomGroup, bool useSubgroupConstruction, string json, T obj)
+        private void WriteSerializationTestFile<T>(bool useCustomGroup, string json, T obj)
         {
             FileStream fs = File.Open("../../../SerializationReference/" + Path.GetRandomFileName() + ".dat", FileMode.Create);
 
             BinaryWriter bw = new BinaryWriter(fs);
             bw.Write(useCustomGroup);
-            bw.Write(useSubgroupConstruction);
             bw.Write(obj.GetType().FullName);
             bw.Write(json);
 

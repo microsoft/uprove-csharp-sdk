@@ -46,17 +46,14 @@ namespace UProveTestVectors
             });
             formater.PrintHex("hash_list [0x01, 0x0102030405, null]", null, null, hash_list);
 
-            // hash default group constructions
-            byte[] hash_subgroup = ProtocolHelper.HashToBytes(hash, new object[] { RecommendedParameters.L2048N256.p, RecommendedParameters.L2048N256.q, RecommendedParameters.L2048N256.g });
-            formater.PrintHex("hash_group (1.3.6.1.4.1.311.75.1.1.1)", null, null, hash_subgroup);
-
+            // hash default group construction
             FpCurve curve = (FpCurve)RecommendedParameters.P256.parameters.Curve;
             byte[] hash_ecgroup = ProtocolHelper.HashToBytes(hash, new object[] { curve.Q, curve.A.ToBigInteger(), curve.B.ToBigInteger(), RecommendedParameters.P256.g, RecommendedParameters.P256.parameters.N, BigInteger.One });
             formater.PrintHex("hash_group (1.3.6.1.4.1.311.75.1.2.1)", null, null, hash_ecgroup);
         }
 
         internal static int UIDpIndex = 1;
-        internal static void GenerateTestVectors(string uidp, Formatter formater, bool subgroup, bool supportDevice, bool lite, int maxAttribIndex, int[] D)
+        internal static void GenerateTestVectors(string uidp, Formatter formater, bool supportDevice, bool lite, int maxAttribIndex, int[] D)
         {
             if (formater.type != Formatter.Type.doc)
             {
@@ -78,15 +75,7 @@ namespace UProveTestVectors
             // Setup
             //
 
-            Group Gq;
-            if (subgroup)
-            {
-                Gq = new SubGroup(RecommendedParameters.L2048N256.p, RecommendedParameters.L2048N256.q, RecommendedParameters.L2048N256.g, RecommendedParameters.L2048N256.Oid);
-            }
-            else
-            {
-                Gq = new P256ECGroup();
-            }
+            Group Gq = new P256ECGroup();
             BigInteger q = Gq.Order;
 
             // issuer setup
@@ -102,28 +91,13 @@ namespace UProveTestVectors
             generators[0] = Gq.Generator.Exponentiate(y0);
             generators[0].Print("g0", formater);
             GroupElement deviceGenerator;
-            if (subgroup)
+            for (int i = 1; i <= n; i++)
             {
-                SubGroup sgGq = (SubGroup)Gq;
-                for (int i = 1; i <= n; i++)
-                {
-                    // we use the recommended parameters for the g_i
-                    generators[i] = new SubgroupElement(RecommendedParameters.L2048N256.g_i[i - 1], sgGq);
-                }
-                generators[t] = new SubgroupElement(RecommendedParameters.L2048N256.g_t, sgGq);
-                deviceGenerator = new SubgroupElement(RecommendedParameters.L2048N256.g_d, sgGq);
+                // we use the recommended parameters for the g_i
+                generators[i] = new ECElement(RecommendedParameters.P256.g_i[i - 1]); // g_i is zero-based
             }
-            else
-            {
-                for (int i = 1; i <= n; i++)
-                {
-                    // we use the recommended parameters for the g_i
-                    generators[i] = new ECElement(RecommendedParameters.P256.g_i[i - 1]); // g_i is zero-based
-                }
-                generators[t] = new ECElement(RecommendedParameters.P256.g_t);
-                deviceGenerator = new ECElement(RecommendedParameters.P256.g_d);
-            }
-
+            generators[t] = new ECElement(RecommendedParameters.P256.g_t);
+            deviceGenerator = new ECElement(RecommendedParameters.P256.g_d);
 
             byte[] e = { 0x00, 0x01, 0x01, 0x00, 0x00 };
             for (int i = 0; i < e.Length; i++)

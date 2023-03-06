@@ -14,15 +14,10 @@
 namespace UProveCrypto
 {
     /// <summary>
-    /// Defines the supported group constructions: Subgroup and ECC.
+    /// Defines the supported group ECC construction.
     /// </summary>
     public enum GroupType 
     {
-        /// <summary>
-        /// A group which uses the Subgroup construction.
-        /// </summary>
-        Subgroup, 
-
         /// <summary>
         /// A group which uses the Elliptic Curve construction.
         /// </summary>
