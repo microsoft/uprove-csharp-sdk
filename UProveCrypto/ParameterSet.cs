@@ -60,10 +60,7 @@ namespace UProveCrypto
         /// <returns><code>true</code> if the requested parameter set is found, <code>false</code> otherwise.</returns>
         public static bool ContainsParameterSet(string oid)
         {
-            if (oid == SubgroupParameterSets.ParamSet_SG_2048256_V1Name ||
-                oid == SubgroupParameterSets.ParamSet_SG_3072256_V1Name ||
-                oid == SubgroupParameterSets.ParamSet_SG_1024160_V1Name ||
-                oid == ECParameterSets.ParamSet_EC_P256_V1Name ||
+            if (oid == ECParameterSets.ParamSet_EC_P256_V1Name ||
                 oid == ECParameterSets.ParamSet_EC_P384_V1Name ||
                 oid == ECParameterSets.ParamSet_EC_P521_V1Name ||
                 oid == ECParameterSets.ParamSet_EC_BN254_V1Name)
@@ -78,8 +75,6 @@ namespace UProveCrypto
         
         /// <summary>
         /// Returns the identified parameter set if it exists. Valid <paramref name="oid"/> values are
-        /// <see cref="SubgroupParameterSets.ParamSet_SG_2048256_V1Name"/>, 
-        /// <see cref="SubgroupParameterSets.ParamSet_SG_3072256_V1Name"/>,
         /// <see cref="ECParameterSets.ParamSet_EC_P256_V1Name"/>,
         /// <see cref="ECParameterSets.ParamSet_EC_P384_V1Name"/>, and
         /// <see cref="ECParameterSets.ParamSet_EC_P521_V1Name"/>.
@@ -91,19 +86,7 @@ namespace UProveCrypto
         {
             set = null;
 
-            if (oid == SubgroupParameterSets.ParamSet_SG_2048256_V1Name)
-            {
-                set = SubgroupParameterSets.ParamSetL2048N256V1;
-            }
-            else if (oid == SubgroupParameterSets.ParamSet_SG_3072256_V1Name)
-            {
-                set = SubgroupParameterSets.ParamSetL3072N256V1;
-            }
-            else if (oid == SubgroupParameterSets.ParamSet_SG_1024160_V1Name)
-            {
-                set = SubgroupParameterSets.ParamSetL1024N160V1;
-            }
-            else if (oid == ECParameterSets.ParamSet_EC_P256_V1Name)
+            if (oid == ECParameterSets.ParamSet_EC_P256_V1Name)
             {
                 set = ECParameterSets.ParamSet_EC_P256_V1;
             }

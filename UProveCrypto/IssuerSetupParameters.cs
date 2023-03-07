@@ -222,19 +222,14 @@ namespace UProveCrypto
         }
 
         /// <summary>
-        /// Returns the default parameter set for a specified construction. For <see cref="GroupType.Subgroup"/>,
-        /// the default is <see cref="SubgroupParameterSets.ParamSetL2048N256V1"/>; for <see cref="GroupType.ECC"/>,
+        /// Returns the default parameter set for a specified construction. For <see cref="GroupType.ECC"/>,
         /// the default is <see cref="ECParameterSets.ParamSet_EC_P256_V1"/>.
         /// </summary>
         /// <param name="construction">Group construction to use. Defaults to <see cref="GroupType.ECC"/>.</param>
         /// <returns>The default parameter set.</returns>
         public static ParameterSet GetDefaultParameterSet(GroupType construction = GroupType.ECC)
         {
-            if (construction == GroupType.Subgroup)
-            {
-                return SubgroupParameterSets.ParamSetL2048N256V1;
-            }
-            else if (construction == GroupType.ECC)
+            if (construction == GroupType.ECC)
             {
                 return ECParameterSets.ParamSet_EC_P256_V1;
             }

@@ -323,7 +323,7 @@ namespace UProveUnitTest
 
         }
         
-        private GroupType[] groupConstructions = { GroupType.Subgroup, GroupType.ECC };
+        private GroupType[] groupConstructions = { GroupType.ECC };
         private string[] supportedHashFunctions = { "SHA256", "SHA512" };
         [TestMethod]
         public void TestEndToEnd()
@@ -501,11 +501,11 @@ namespace UProveUnitTest
             return sb.ToString();
         }
 
-        private void RunFuzzedTest(bool useSubgroupConstruction, string hashFunction, int numberOfAttributes, bool supportDevice, int numberOfTokens, int[] dArray, int[] cArray, int pseudonymIndex)
+        private void RunFuzzedTest(string hashFunction, int numberOfAttributes, bool supportDevice, int numberOfTokens, int[] dArray, int[] cArray, int pseudonymIndex)
         {
             // Issuer setup
             IssuerSetupParameters isp = new IssuerSetupParameters();
-            isp.GroupConstruction = useSubgroupConstruction ? GroupType.Subgroup : GroupType.ECC;
+            isp.GroupConstruction = GroupType.ECC;
             isp.UidP = GetRandomBytes(MaxByteArrayLength);
             isp.UidH = hashFunction;
             isp.E = IssuerSetupParameters.GetDefaultEValues(numberOfAttributes);
@@ -583,7 +583,6 @@ namespace UProveUnitTest
                 StringBuilder msg = new StringBuilder("Test options: ");
 
                 int numberOfPregenGenerators = ParameterSet.NumberOfIssuerGenerators;
-                bool useSubgroupConstruction = CoinFlip(); msg.Append("group=" + (useSubgroupConstruction ? "subgroup" : "ECC"));
                 int numberOfAttributes = CoinFlip() ?
                     // small number of attributes to use recommeded params [0, max]
                     random.Next(numberOfPregenGenerators + 1) :
@@ -621,7 +620,7 @@ namespace UProveUnitTest
                 }
                 try
                 {
-                    RunFuzzedTest(useSubgroupConstruction, "SHA256", numberOfAttributes, deviceProtected, numberOfTokens, dArray, cArray, pseudonymIndex);
+                    RunFuzzedTest("SHA256", numberOfAttributes, deviceProtected, numberOfTokens, dArray, cArray, pseudonymIndex);
                 }
                 catch (Exception e)
                 {

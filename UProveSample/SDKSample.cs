@@ -71,7 +71,7 @@ namespace UProveSample
             // an application profile would define the format of the specification field,
             // we use a dummy value in this sample
             isp.S = encoding.GetBytes("application-specific specification");
-            // specify the group type: subgroup (default) or ECC
+            // specify the group type
             isp.GroupConstruction = groupType;
 
             return isp.Generate(supportDevice);
@@ -204,7 +204,7 @@ namespace UProveSample
              *  issuer setup
              */
 
-            IssuerKeyAndParameters ikap = SetupUProveIssuer("sample device-protected issuer", 3, GroupType.Subgroup, true);
+            IssuerKeyAndParameters ikap = SetupUProveIssuer("sample device-protected issuer", 3, GroupType.ECC, true);
             string ipJSON = ikap.IssuerParameters.Serialize();
 
             // the IssuerParameters instance needs to be distributed to the Prover, Device, and Verifier.

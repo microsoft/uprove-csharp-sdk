@@ -85,7 +85,7 @@ namespace UProveUnitTest
             byte[][] A = new byte[][] { encoding.GetBytes("attribute value") };
             byte[] TI = encoding.GetBytes("TI value");
             IssuerSetupParameters isp = new IssuerSetupParameters();
-            isp.GroupConstruction = GroupType.Subgroup;
+            isp.GroupConstruction = GroupType.ECC;
             isp.UidP = encoding.GetBytes("UIDP value");
             isp.E = new byte[] { 1 };
             IssuerKeyAndParameters ikap = isp.Generate();
@@ -95,10 +95,9 @@ namespace UProveUnitTest
             // invalidate the issuer parameters
 
             IssuerParameters ip = ikap.IssuerParameters;
-            SubgroupGroupElement sgG0 = (SubgroupGroupElement) ip.G[0];
             byte[] g0Bytes = ip.G[0].GetEncoded();
             g0Bytes[g0Bytes.Length - 1]++;
-            ip.G[0] = (SubgroupGroupElement) ip.Gq.CreateGroupElement(g0Bytes);
+            ip.G[0] = (ECGroupElement) ip.Gq.CreateGroupElement(g0Bytes);
 
             try
             {

@@ -67,116 +67,92 @@ namespace UProveUnitTest
 
             for (int i = 0; i <= 1; i++)
             {
-                for (int j = 0; j <= 1; j++)
+                bool useCustomGroup = (i == 0);
+
+                IssuerSetupParameters isp = new IssuerSetupParameters();
+                isp.GroupConstruction = GroupType.ECC;
+                if (useCustomGroup)
                 {
-                    bool useCustomGroup = (i == 0);
-                    bool useSubgroupConstruction = (j == 0);
-
-                    IssuerSetupParameters isp = new IssuerSetupParameters();
-                    if (useSubgroupConstruction)
-                    {
-                        isp.GroupConstruction = GroupType.Subgroup;
-                        if (useCustomGroup)
-                        {
-                            byte[] p = HexToBytes("d21ae8d66e6c6b3ced0eb3df1a26c91bdeed013c17d849d30ec309813e4d3799f26db0d494e82ec61ea9fdc70bb5cbcaf2e5f18a836494f58e67c6d616480c37a7f2306101fc9f0f4768f9c9793c2be176b0b7c979b4065d3e835686a3f0b8420c6834cb17930386dedab2b07dd473449a48baab316286b421052475d134cd3b");
-                            byte[] q = HexToBytes("fff80ae19daebc61f46356af0935dc0e81148eb1");
-                            byte[] g = HexToBytes("abcec972e9a9dd8d133270cfeac26f726e567d964757630d6bd43460d0923a46aec0ace255ebf3ddd4b1c4264f53e68b361afb777a13cf0067dae364a34d55a0965a6cccf78852782923813cf8708834d91f6557d783ec75b5f37cd9185f027b042c1c72e121b1266a408be0bb7270d65917b69083633e1f3cd60624612fc8c1");
-                            isp.Gq = SubgroupGroup.CreateSubgroupGroup(
-                                p,
-                                q,
-                                g,
-                                null,
-                                null);
-                            isp.UidH = "SHA1";
-                        }
-                    }
-                    else
-                    {
-                        isp.GroupConstruction = GroupType.ECC;
-                        if (useCustomGroup)
-                        {
-                            continue;
-                        }
-                    }
-
-                    isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
-                    isp.E = IssuerSetupParameters.GetDefaultEValues(3);
-                    isp.S = encoding.GetBytes("application-specific specification");
-
-                    // Generate IssuerKeyAndParameters
-                    IssuerKeyAndParameters ikap = isp.Generate();
-
-                    // Create an IssuerParameters
-                    IssuerParameters ip = ikap.IssuerParameters;
-
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, ikap);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, ikap.IssuerParameters);
-
-                    // specify the attribute values
-                    byte[][] attributes = new byte[][] {
-                    encoding.GetBytes("first attribute value"),
-                    encoding.GetBytes("second attribute value"),
-                    encoding.GetBytes("third attribute value")   };
-
-                    // specify the special field values
-                    byte[] tokenInformation = encoding.GetBytes("token information value");
-                    byte[] proverInformation = encoding.GetBytes("prover information value");
-
-                    // specify the number of tokens to issue
-                    int numberOfTokens = 5;
-
-                    // setup the issuer and generate the first issuance message
-                    IssuerProtocolParameters ipp = new IssuerProtocolParameters(ikap);
-                    ipp.Attributes = attributes;
-                    ipp.NumberOfTokens = numberOfTokens;
-                    ipp.TokenInformation = tokenInformation;
-                    Issuer issuer = ipp.CreateIssuer();
-                    FirstIssuanceMessage firstMessage = issuer.GenerateFirstMessage();
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, firstMessage);
-
-                    // setup the prover and generate the second issuance message
-                    Prover prover = new Prover(ip, numberOfTokens, attributes, tokenInformation, proverInformation, null);
-                    SecondIssuanceMessage secondMessage = prover.GenerateSecondMessage(firstMessage);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, secondMessage);
-
-                    // generate the third issuance message
-                    ThirdIssuanceMessage thirdMessage = issuer.GenerateThirdMessage(secondMessage);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, thirdMessage);
-
-                    // generate the tokens
-                    UProveKeyAndToken[] upkt = prover.GenerateTokens(thirdMessage);
-
-                    for (int k = 0; k < upkt.Length; k++)
-                    {
-                        string json = ip.Serialize(upkt[k]);
-                        UProveKeyAndToken upkt_fromJson = ip.Deserialize<UProveKeyAndToken>(json);
-                        Assert.IsTrue(Verify(upkt[k], upkt_fromJson));
-                    }
-
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, upkt[0].Token);
-
-                    /*
-                     *  token presentation
-                     */
-                    // the indices of disclosed attributes
-                    int[] disclosed = new int[] { 2 };
-                    // the indices of committed attributes
-                    int[] committed = new int[] { 3 };
-                    // the returned commitment randomizers, to be used by an external proof module
-                    FieldZqElement[] tildeO;
-                    // the application-specific message that the prover will sign. Typically this is a nonce combined
-                    // with any application-specific transaction data to be signed.
-                    byte[] message = encoding.GetBytes("message");
-                    // the application-specific verifier scope from which a scope-exclusive pseudonym will be created
-                    // (if null, then a pseudonym will not be presented)
-                    byte[] scope = encoding.GetBytes("verifier scope");
-                    // generate the presentation proof
-                    PresentationProof proof = PresentationProof.Generate(ip, disclosed, committed, 1, scope, message, null, null, upkt[0], attributes, out tildeO);
-                    VerifySerialization(useCustomGroup, useSubgroupConstruction, ip, proof);
-
-                    // verify the presentation proof
-                    proof.Verify(ip, disclosed, committed, 1, scope, message, null, upkt[0].Token);
+                    continue;
                 }
+
+                isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
+                isp.E = IssuerSetupParameters.GetDefaultEValues(3);
+                isp.S = encoding.GetBytes("application-specific specification");
+
+                // Generate IssuerKeyAndParameters
+                IssuerKeyAndParameters ikap = isp.Generate();
+
+                // Create an IssuerParameters
+                IssuerParameters ip = ikap.IssuerParameters;
+
+                VerifySerialization(useCustomGroup, ip, ikap);
+                VerifySerialization(useCustomGroup, ip, ikap.IssuerParameters);
+
+                // specify the attribute values
+                byte[][] attributes = new byte[][] {
+                encoding.GetBytes("first attribute value"),
+                encoding.GetBytes("second attribute value"),
+                encoding.GetBytes("third attribute value")   };
+
+                // specify the special field values
+                byte[] tokenInformation = encoding.GetBytes("token information value");
+                byte[] proverInformation = encoding.GetBytes("prover information value");
+
+                // specify the number of tokens to issue
+                int numberOfTokens = 5;
+
+                // setup the issuer and generate the first issuance message
+                IssuerProtocolParameters ipp = new IssuerProtocolParameters(ikap);
+                ipp.Attributes = attributes;
+                ipp.NumberOfTokens = numberOfTokens;
+                ipp.TokenInformation = tokenInformation;
+                Issuer issuer = ipp.CreateIssuer();
+                FirstIssuanceMessage firstMessage = issuer.GenerateFirstMessage();
+                VerifySerialization(useCustomGroup, ip, firstMessage);
+
+                // setup the prover and generate the second issuance message
+                Prover prover = new Prover(ip, numberOfTokens, attributes, tokenInformation, proverInformation, null);
+                SecondIssuanceMessage secondMessage = prover.GenerateSecondMessage(firstMessage);
+                VerifySerialization(useCustomGroup, ip, secondMessage);
+
+                // generate the third issuance message
+                ThirdIssuanceMessage thirdMessage = issuer.GenerateThirdMessage(secondMessage);
+                VerifySerialization(useCustomGroup, ip, thirdMessage);
+
+                // generate the tokens
+                UProveKeyAndToken[] upkt = prover.GenerateTokens(thirdMessage);
+
+                for (int k = 0; k < upkt.Length; k++)
+                {
+                    string json = ip.Serialize(upkt[k]);
+                    UProveKeyAndToken upkt_fromJson = ip.Deserialize<UProveKeyAndToken>(json);
+                    Assert.IsTrue(Verify(upkt[k], upkt_fromJson));
+                }
+
+                VerifySerialization(useCustomGroup, ip, upkt[0].Token);
+
+                /*
+                    *  token presentation
+                    */
+                // the indices of disclosed attributes
+                int[] disclosed = new int[] { 2 };
+                // the indices of committed attributes
+                int[] committed = new int[] { 3 };
+                // the returned commitment randomizers, to be used by an external proof module
+                FieldZqElement[] tildeO;
+                // the application-specific message that the prover will sign. Typically this is a nonce combined
+                // with any application-specific transaction data to be signed.
+                byte[] message = encoding.GetBytes("message");
+                // the application-specific verifier scope from which a scope-exclusive pseudonym will be created
+                // (if null, then a pseudonym will not be presented)
+                byte[] scope = encoding.GetBytes("verifier scope");
+                // generate the presentation proof
+                PresentationProof proof = PresentationProof.Generate(ip, disclosed, committed, 1, scope, message, null, null, upkt[0], attributes, out tildeO);
+                VerifySerialization(useCustomGroup, ip, proof);
+
+                // verify the presentation proof
+                proof.Verify(ip, disclosed, committed, 1, scope, message, null, upkt[0].Token);
             }
 
         }
@@ -192,37 +168,26 @@ namespace UProveUnitTest
                 BinaryReader br = new BinaryReader(f);
 
                 bool useCustomGroup = (bool)br.ReadBoolean();//  parameters[0];
+                // TODO: delete from here ----
+                // TODO: current test files contain a group boolean; we don't need that anymore since deprecating
+                // the subgroup construction. We need to delete the ones corresponding to the deprecated constructions.
                 bool useSubgroupConstruction = (bool)br.ReadBoolean();
+                if (useSubgroupConstruction)
+                {
+                    Console.WriteLine("Delete subgroup test file: " + fileName);
+                    continue;
+                }
+                // TODO: ---- until here
                 string typeName = (string)br.ReadString();
                 string json = (string)br.ReadString();
 
                 f.Close();
 
                 IssuerSetupParameters isp = new IssuerSetupParameters();
-                if (useSubgroupConstruction)
+                isp.GroupConstruction = GroupType.ECC;
+                if (useCustomGroup)
                 {
-                    isp.GroupConstruction = GroupType.Subgroup;
-                    if (useCustomGroup)
-                    {
-                        byte[] p = HexToBytes("d21ae8d66e6c6b3ced0eb3df1a26c91bdeed013c17d849d30ec309813e4d3799f26db0d494e82ec61ea9fdc70bb5cbcaf2e5f18a836494f58e67c6d616480c37a7f2306101fc9f0f4768f9c9793c2be176b0b7c979b4065d3e835686a3f0b8420c6834cb17930386dedab2b07dd473449a48baab316286b421052475d134cd3b");
-                        byte[] q = HexToBytes("fff80ae19daebc61f46356af0935dc0e81148eb1");
-                        byte[] g = HexToBytes("abcec972e9a9dd8d133270cfeac26f726e567d964757630d6bd43460d0923a46aec0ace255ebf3ddd4b1c4264f53e68b361afb777a13cf0067dae364a34d55a0965a6cccf78852782923813cf8708834d91f6557d783ec75b5f37cd9185f027b042c1c72e121b1266a408be0bb7270d65917b69083633e1f3cd60624612fc8c1");
-                        isp.Gq = SubgroupGroup.CreateSubgroupGroup(
-                            p,
-                            q,
-                            g,
-                            null,
-                            null);
-                        isp.UidH = "SHA1";
-                    }
-                }
-                else
-                {
-                    isp.GroupConstruction = GroupType.ECC;
-                    if (useCustomGroup)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 isp.UidP = encoding.GetBytes("http://issuer/uprove/issuerparams/software");
@@ -288,161 +253,13 @@ namespace UProveUnitTest
             }
         }
 
-
-        [TestMethod]
-        public void TestSerializationErrors()
-        {
-            string ipJson =
-                @"{""uidp"":""aHR0cDovL2lzc3Vlci91cHJvdmUvaXNzdWVycGFyYW1zL3NvZnR3YXJl"",
-                   ""descGq"":{
-                      ""type"":""sg"",
-                      ""sgDesc"":{
-                             ""p"":""0hro1m5sazztDrPfGibJG97tATwX2EnTDsMJgT5NN5nybbDUlOguxh6p\/ccLtcvK8uXxioNklPWOZ8bWFkgMN6fyMGEB\/J8PR2j5yXk8K+F2sLfJebQGXT6DVoaj8LhCDGg0yxeTA4be2rKwfdRzRJpIuqsxYoa0IQUkddE0zTs="",
-                             ""q"":""\/\/gK4Z2uvGH0Y1avCTXcDoEUjrE="",
-                             ""g"":""q87Jcump3Y0TMnDP6sJvcm5WfZZHV2MNa9Q0YNCSOkauwKziVevz3dSxxCZPU+aLNhr7d3oTzwBn2uNko01VoJZabMz3iFJ4KSOBPPhwiDTZH2VX14PsdbXzfNkYXwJ7BCwccuEhsSZqQIvgu3Jw1lkXtpCDYz4fPNYGJGEvyME=""
-                          }
-                   },
-                   ""uidh"":""SHA1"",
-                   ""g"":[
-                          ""OkklmmgheMsvW2M0QIKqBsTsjmkQUSybFwod\/Wu4Q9qd21VVkbgIHG0BwlhJtU4CRZ\/oxnX6+JySb2qzc+Kyqcy\/FrUki3wOuul\/qOS5TSxVavF5aRkcF3Lda0ilvtCevOoKSHwaz4sHnoNLITufKECfhrC9MewFIeK4ynuO9jA="",
-                          ""ozL4rA+XfgPcvW9KTkAWuYcKW\/tiIGKCw3fSDb0yYSg\/+aczjmqY4GTy1ffJUYl+b4twm7XwB3Rey0aDqQN+XwS9qbs7fsxAj9OFFZiI7jDNzmBT6bGmeyxMkiYCWMZlYTE154+oasan\/wqtufC8N0BpEqAYQvCKyLMN6SABKGA="",
-                          ""zkmer9J5f2M2VBcu0COTYHoWWmzuxwfMqpJQ5N9UE\/WMuDBOAZLmLzzT9cYiSB+fSCPrvTbNC6nExfJx0jGG4uPE32NDwVInbzWJldTDJEWa5XFIKxDRRUKN0UG1PbDp+BOMQ0kqeOTVn\/vrpuqwFRfBP2ZppIJXhKdDeiBUWI0="",
-                          ""iApB3wHbVWU1A\/b3iPkXXXV86PD3JCED+ogSrxddmgJ3ALWOuLtRCe5O1MnmlmWzP22D3xQ7b2eWjI+hHp9ZhEToSUYrzx9RzIPFuRSflJbRKPv210pmtjx2QBOKq5Z5fxVE\/DM5MiWMQmeINNy8DNRMxqFJPkhoLu0V4uqDocs="",
-                          ""selOZXQwG7AwW1veYigEW9Tl1INw\/V0rXkQDx4OtJ8lCvv2RpAh4SkoUoy6yL2yOVZqd5rosTP8snKYO5L1aE4aqZNuNL8GD\/XxXbW7tzf\/OqOAqilJG4C+2\/IQADK42p674HIkf6Txj5P+epGhcl8V+XYyFNKYhXmUq\/9ju1fY=""
-                        ],
-                   ""e"":""AQEB"",
-                   ""s"":""YXBwbGljYXRpb24tc3BlY2lmaWMgc3BlY2lmaWNhdGlvbg==""
-                }";
-
-            IssuerParameters ip = new IssuerParameters(ipJson);
-
-            TestError<IssuerParameters>(ip, RemoveValue(ipJson, "uidp"), "IssuerParameters:uidp");
-            TestError<IssuerParameters>(ip, RemoveValue(ipJson, "uidh"), "IssuerParameters:uidh");
-            TestError<IssuerParameters>(ip, RemoveArrayValue(ipJson, "g"), "IssuerParameters:g");
-            TestError<IssuerParameters>(ip, RemoveObject(ipJson, "descGq"), "IssuerParameters:descGq");
-            TestError<IssuerParameters>(ip, "{blah,blah,blah}", "IssuerParameters");
-            TestError<IssuerParameters>(ip, "{{}", "IssuerParameters");
-
-            string missingGelement = ipJson.Replace(
-                "\"OkklmmgheMsvW2M0QIKqBsTsjmkQUSybFwod\\/Wu4Q9qd21VVkbgIHG0BwlhJtU4CRZ\\/oxnX6+JySb2qzc+Kyqcy\\/FrUki3wOuul\\/qOS5TSxVavF5aRkcF3Lda0ilvtCevOoKSHwaz4sHnoNLITufKECfhrC9MewFIeK4ynuO9jA=\",",
-                "");
-            TestError<IssuerParameters>(ip, missingGelement, "IssuerParameters:Invalid number of elements in G");
-            TestError<IssuerParameters>(ip, RemoveValue(ipJson, "p"), "IssuerParameters:p, q, g cannot be null");
-            TestError<IssuerParameters>(ip, RemoveValue(ipJson, "q"), "IssuerParameters:p, q, g cannot be null");
-
-            string ipwk = "{\"ip\":{\"uidp\":\"aHR0cDovL2lzc3Vlci91cHJvdmUvaXNzdWVycGFyYW1zL3NvZnR3YXJl\",\"descGq\":{\"type\":\"sg\",\"sgDesc\":{\"p\":\"0hro1m5sazztDrPfGibJG97tATwX2EnTDsMJgT5NN5nybbDUlOguxh6p\\/ccLtcvK8uXxioNklPWOZ8bWFkgMN6fyMGEB\\/J8PR2j5yXk8K+F2sLfJebQGXT6DVoaj8LhCDGg0yxeTA4be2rKwfdRzRJpIuqsxYoa0IQUkddE0zTs=\",\"q\":\"\\/\\/gK4Z2uvGH0Y1avCTXcDoEUjrE=\",\"g\":\"q87Jcump3Y0TMnDP6sJvcm5WfZZHV2MNa9Q0YNCSOkauwKziVevz3dSxxCZPU+aLNhr7d3oTzwBn2uNko01VoJZabMz3iFJ4KSOBPPhwiDTZH2VX14PsdbXzfNkYXwJ7BCwccuEhsSZqQIvgu3Jw1lkXtpCDYz4fPNYGJGEvyME=\"}},\"uidh\":\"SHA1\",\"g\":[\"ybxHPsPkePTYYMiUGETQ822iQg+85hvv06Z8flO9e1YNZfS5r7OhKpeynQG0UJ\\/ESR4yLv8dhPQbcP\\/q\\/jeRNDMo0ADilNP6hG4X1DAR4zBkSxD6lYZdiHwR+6AIW06OzfL\\/kHKMFBlrgoRCH+XBb3krgp4AQbPgBwNA0Qoo2UY=\",\"pdo\\/xldIiFccsQHzwAAWdovZvqMyaUgACRaCKSne9tvO1hmT2Bq9pSx7ijv7tRuXxZgkCsK\\/jD3dw2iUGh\\/7GBxaOIM80aMuMZVq+nfwbH0Jnq5VfOd31V2Bu1Zk32QgYIIihKpF8tB1UMpMDnA3GMRMDg8HS9zylU4nRtvFR+g=\",\"OJAOz01vw+3Z1jKhOVr3oiRxELLbpg956KXik\\/Lhmmxra9Q7kSkD0fvmw6rOLNcnlxTeF9MXWVn6qxUvYRjh1ySHDLqF4l3o6UnzamMCZhtqnwoLFAnYxFy50ZDJwXIxZSpWDiolM8MKouLuav94mTjZRTTyfFAkKsqtbk1eo5U=\",\"IkJR\\/dTsz3e5V5QGSXbDd1b95OGHOmaXPA\\/cpkSYnqjmM190c5yCdDYrp1nxRd01me2gYEvWyCgvmAzAJFbWq\\/UTEzV+SoXbTfK9NgqavtCqftSLEmAE7abbLxMCJJORPLkTcuvdvyr2etlbJkJd0tcr58NngFDnFG6fVD2IZ7k=\",\"PhDwzgR9D+BSwgnwgswy6m6i\\/8B6\\/ToPtbBLEUw4g81wrL5FlwDnr53sXdiEdCPd\\/JIJVx62u8tZhbTZhxEVVpyCO4OPC1FW9lTyactU5fsrDoxix1oVD6hBaDYleWfH6i8EXZJaWdVwAWN\\/dh5Fil9dg8QM5RGeB7DFWAgLhNQ=\"],\"e\":\"AQEB\",\"s\":\"YXBwbGljYXRpb24tc3BlY2lmaWMgc3BlY2lmaWNhdGlvbg==\"},\"key\":\"JqhFTJQnvemGaFyAa+Zl+CbRuls=\"}";
-
-            TestError<IssuerKeyAndParameters>(ip, RemoveObject(ipwk, "ip"), "IssuerKeyAndParameters:ip");
-            TestError<IssuerKeyAndParameters>(ip, RemoveValue(ipwk, "key"), "IssuerKeyAndParameters:key");
-            TestError<IssuerKeyAndParameters>(ip, RemoveValue(ipwk, "uidp"), "IssuerKeyAndParameters:uidp");
-            TestError<IssuerKeyAndParameters>(ip, RemoveValue(ipwk, "uidh"), "IssuerKeyAndParameters:uidh");
-            TestError<IssuerKeyAndParameters>(ip, RemoveArrayValue(ipwk, "g"), "IssuerKeyAndParameters:g");
-            TestError<IssuerKeyAndParameters>(ip, RemoveObject(ipwk, "descGq"), "IssuerKeyAndParameters:descGq");
-            TestError<IssuerKeyAndParameters>(ip, ipJson, "IssuerKeyAndParameters:ip");
-            TestError<IssuerKeyAndParameters>(ip, "{{}", "IssuerKeyAndParameters");
-
-            string message1 = "{\"sa\":[\"LnaEgB1ha9PIZ2DTTZ4CyN4rT6XZGBPAkpO5MMnvIa9mZTgH3wAcRJzHxZIMYw7YMTEZglpxlixzwAxb+iZsHu8V8iqa2olRlw+MOVOcqhSWKtqCTnaK8FZQaV69QosrhvWPntopm5I6Sj\\/x4Krv2Ln4sHHgxSRdLzPQTHIFMy0=\",\"ivd8mtzHTUsEk99FWaOpDcjMw1rfhMzZopv7Uo0zvIBSK3J9KXy71+D9+v8yzGr3G3l0LDo9Ha\\/tN8XY\\/AycvgvLHxNtFjBO2st8K2YApQAF2RMbyABYCKrKihWcBXDqBTVnMD\\/BI5Mq6NjGUmEuIaV9juYJIUkmqb4MBjhvLIw=\",\"nrr+yim8PJDtBq0gcmGOZYLqvjoKEVoq0nGqo\\/ijHLhpKx3GLnITte4QJzDuQEd\\/dPHKO\\/s\\/BH+IArFE6huVYSPaFO6qLd1Z5UrKAwd2RZd3rmJbIRevQSM70RbQUAM4P7jOYzSu3fTKvdYU+W7mDRlZf7KM8WYssTaSNXRYvqI=\",\"SJ6w9zTgwN8WgUmdFT9OkWIUdCTPN5mzfub22ZogtpgvUGH8hsNjFkVveO5XKiC2QUoAHblcBkwSt2kCN6BPnhKU5RxPtZe7JKeAp4taoMGYSLv7Co8aE7LrxIFpk1A2NSBMANcfpN8yDMDqS3vP+gpe4aEkP\\/gTwZ\\/VPEIB6aI=\",\"Nczg7v1RmoNVHiKKvXCdk8jvCLc96JU\\/lgjhl8iRGzVf8YvmgP7MiFydkNVVbhK5\\/PNP1N5Df++CSaewzyD1p0AN7p+B33G9dU7BE\\/0IiaXELjMl7YJEYc48Zh0utZcfvfdPf\\/8gUXIpXKbRDrC9MaH0a5C6IemaafCmct9EcU0=\"],\"sb\":[\"B1CJQyeH1AYi2VoMPFds4OULxZEZnO+qSHV9i99pXdlTidimZR08bjngdvwpc6ISfmPZbArGBx4WgNN6zOrMInql3MZhvVc\\/lBkKvt\\/UktAotWS\\/pMCwW6dcVABhcBuGyZYfu6\\/ywzV3PMun9nVY4GPRSWu7mpw1CjaN\\/lrvnY8=\",\"hVThpS6Rlsvpg4f4LEROBBJP2K4B5AKHaaSKID2MSYpJX+VW0cFM+w6OkoSfgnKT+uPyOssTuHW9yqKc8n1hyJ5d4i7yrau27GEWTK1Sy53jj2lYCnTFc5f2rb4IVm\\/gnT795TUa2TOwVnDH\\/boma\\/8HNvyAoCg9iEZq29pZXtQ=\",\"qf3THOi8qNiIZ3F2Upbpho0EPJukxpTWZrCn1AU5mf+pfYs0h6TC0HwAGzVqDRQ6XccM+yt0w1YoYwqW+Nn1nwf4kwnGoelru8Jotndsp\\/V5k7wY1OTIE8dDK8Ki+weMuWiAQegcPs+NxFXwjwnPf0IzNr3dA3R4\\/BrT5Ks8Aig=\",\"vwKZ2JAw9Z7oEWZi7uBsVlb\\/NitrOy+BNHMMhihWBr\\/YmFu52h3rvZfUbQeI17XjdvmqBlsPbBs34dRmHRh4SiaP5cxwqxv\\/IKmOt0lJQj0ivIKPaE9rhBraDhRGE6biNllsAjQGFvbG\\/EYVkaA1wbo++ox0iS6CZBrjU65l\\/Y8=\",\"xHPY++6Yc8RvfuBJ+fMsVSi7IxbtTQWiaSxaoGSENjs6rZnDK+5Jvhk2\\/fnxs2G2Xk6DECy7NrAKNJpWQTDQiAGkqBS0LdewSo07cYnTvV+dKcGjb7nOQtCyxxRv1RX42bP16ejZt8Ff0rcSEOn3SgS3tWhUf3wXachYR3uPxZo=\"],\"sz\":\"hI447D7Y2b6UyTyzW7zW9Ca1qCvvCBPPI+YiFr4ezVzoYddXsqsJhx6+qEerd3\\/cg4uo3loeIAYX8wq411n75fLOZcFSCcGm\\/005BwswFgCCrPr88YJejIbhd0kRPSzKalbGieM5AusE3hfwWV3JxkRxLHuhOLvqJUSlUbzNYME=\"}";
-
-            TestError<FirstIssuanceMessage>(ip, RemoveValue(message1, "sz"), "FirstIssuanceMessage:sz");
-            TestError<FirstIssuanceMessage>(ip, RemoveArrayValue(message1, "sa"), "FirstIssuanceMessage:sa");
-            TestError<FirstIssuanceMessage>(ip, RemoveArrayValue(message1, "sb"), "FirstIssuanceMessage:sb");
-
-            string message2 = "{\"sc\":[\"LH+f1uiiftJmIdnG\\/J4KpewQ+g8=\",\"bNwhXE4QksTwTu644oquCxod7hQ=\",\"1jeLI4Mp70sRQ77rX6El2lJYcyI=\",\"z68c60h+c3FXadIHtxzfCE6zn1A=\",\"uxsN8PgR+K985feVRXZkFvGJBo8=\"]}";
-
-            TestError<SecondIssuanceMessage>(ip, RemoveArrayValue(message2, "sc"), "SecondIssuanceMessage:sc");
-
-            string message3 = "{\"sr\":[\"Sip3P3szv\\/SJeYp4wFmkK1vxPJk=\",\"2KDPrSFqIZoI+CIMwikcX6zoSXM=\",\"4W40+xYlIdpey8dMuu\\/qTeOmVN4=\",\"mhZuV0KTpVlBjHILiHJIKg6Xn4s=\",\"mb89DCWD9XRVD1afjsZPd0snVSY=\"]}";
-
-            TestError<ThirdIssuanceMessage>(ip, RemoveArrayValue(message3, "sr"), "ThirdIssuanceMessage:sr");
-
-            string token = "{\"uidp\":\"aHR0cDovL2lzc3Vlci91cHJvdmUvaXNzdWVycGFyYW1zL3NvZnR3YXJl\",\"h\":\"WjQh6FGhkibh+YsFF2E4+CJaKq7goeQ8+jlNFQ+hxJ2orzRiGxlRRlDuGxDaaDrwaPQdtJ6yEhKNCNliJOdsloMx5osNr5FiGKE5CHst7qev9VYcNRNdmUjzcEHnLF1VnSjpMMu9XLUS80enARJWBEWtrh8t2egcgYFwxhsaUxQ=\",\"ti\":\"dG9rZW4gaW5mb3JtYXRpb24gdmFsdWU=\",\"pi\":\"cHJvdmVyIGluZm9ybWF0aW9uIHZhbHVl\",\"szp\":\"zDuCnvtnFc+sXYbURzlz6qe+8xiz2E8d3owf8I98OaEiU3+ar\\/3DZnC906ih\\/a4wmTt3mRB4vuWA2NQk5KpapTArJZEy43\\/nvf1rybMdVETvofyvN6RzsoHi9kkaXDwRe5twUfBmithSjzyHVHIvwq\\/gvxMIo1XrX9Ikg\\/1SHBo=\",\"scp\":\"W6kIN3v5zOlVM9B4rqMkYdGw4zc=\",\"srp\":\"S4XVtuR\\/R\\/\\/cIzawbaPEnnkUePI=\",\"d\":false}";
-
-            TestError<UProveToken>(ip, RemoveValue(token, "uidp"), "UProveToken:uidp");
-            TestError<UProveToken>(ip, RemoveValue(token, "h"), "UProveToken:h");
-            TestError<UProveToken>(ip, RemoveValue(token, "szp"), "UProveToken:szp");
-            TestError<UProveToken>(ip, RemoveValue(token, "scp"), "UProveToken:scp");
-            TestError<UProveToken>(ip, RemoveValue(token, "srp"), "UProveToken:srp");
-
-            string jsonProof = "{\"D\":[\"c2Vjb25kIGF0dHJpYnV0ZSB2YWx1ZQ==\"],\"a\":\"dxEDnCg8ZJBfNYcvZ6adR9Cmljs=\",\"ap\":\"pWkkbWldMiaxD3kGMFRnYVHAnVw=\",\"Ps\":\"G+kX80T0Dz79pSY48SanhvW59D5z7LUC2S7Cvc63duKVjlRU2XNLc0E2mUZ14JUgirLSVocJlUz0SuMI+y6FfOhFzbxE0pKN42Dpkl92FM8w\\/KiYgvuc7zaiWB1aQBKFbjyAz\\/7cWOBxQHTerMQdCWMeHwriCJijwz7obbNtR30=\",\"r0\":\"mLU0IRB5BcNB2i614WWsVvdzt2c=\",\"r\":[\"P69vzesNNKY\\/emnJj7pk81eQVbA=\",\"sInq0AmnvyyoVIk7U9\\/cLv0MvEU=\"]}";
-
-            TestError<PresentationProof>(ip, RemoveArrayValue(jsonProof, "D"), "PresentationProof:D");
-            TestError<PresentationProof>(ip, RemoveValue(jsonProof, "a"), "PresentationProof:a");
-            TestError<PresentationProof>(ip, RemoveArrayValue(jsonProof, "r"), "PresentationProof:r");
-        }
-
-
-        public void TestError<T>(IssuerParameters issuerParameters, string json, string expectedError) where T : IParametrizedDeserialization
-        {
-            try
-            {
-                issuerParameters.Deserialize<T>(json);
-                Assert.Fail("should fail");
-            }
-            catch (SerializationException exp)
-            {
-                Assert.AreEqual(expectedError, exp.Message);
-            }
-        }
-
-
-        public string RemoveValue(string json, string value)
-        {
-            // removes a value  "value":"somedata"
-            string pattern = "\"" + value + @"\s*""\s*:\s*""[^""]+""\s*,?";
-            return System.Text.RegularExpressions.Regex.Replace(json, pattern, "");
-        }
-
-        public string RemoveBool(string json, string value)
-        {
-            // removes a value  "value":"somedata"
-            string pattern = "\"" + value + @"\s*""\s*:\s*(false|true)\s*,?";
-            return System.Text.RegularExpressions.Regex.Replace(json, pattern, "");
-        }
-
-        public string RemoveArrayValue(string json, string value)
-        {
-            // removes a value  "value":"somedata"
-            string pattern = "\"" + value + @"\s*""\s*:\s*\[[^\[\]]+\]\s*,?";
-            return System.Text.RegularExpressions.Regex.Replace(json, pattern, "");
-        }
-
-        public string RemoveObject(string json, string value)
-        {
-            string pattern = "\"" + value + @""":{";
-            int start = json.IndexOf(pattern);
-
-            if (start < 1)
-                throw new InvalidOperationException("could not find " + pattern);
-
-            int index = start + pattern.Length;
-
-            int matchCount = 1;
-
-            int i = index;
-
-            for (; i < json.Length; i++)
-            {
-                char c = json[i];
-                if (c == '{') matchCount++;
-                if (c == '}') matchCount--;
-
-                if (matchCount == 0) break;
-            }
-
-            // also remove a trailing comma
-            if (i + 1 < json.Length && json[i + 1] == ',')
-                i++;
-
-            return json.Remove(start, i - start + 1);
-        }
-
-        public void VerifySerialization<T>(bool useCustomGroup, bool useSubroupConstruction, IssuerParameters ip, T obj) where T : IParametrizedDeserialization
+        public void VerifySerialization<T>(bool useCustomGroup, IssuerParameters ip, T obj) where T : IParametrizedDeserialization
         {
             // serialize the object to json string
             string json = ip.Serialize(obj);
 
             if (CREATE_SERIALIZATION_TEST_FILES)
-                WriteSerializationTestFile(useCustomGroup, useSubroupConstruction, json, obj);
+                WriteSerializationTestFile(useCustomGroup, json, obj);
 
             // output the serialization string
             Debug.WriteLine(typeof(T).Name);
@@ -501,13 +318,12 @@ namespace UProveUnitTest
 
         }
 
-        private void WriteSerializationTestFile<T>(bool useCustomGroup, bool useSubgroupConstruction, string json, T obj)
+        private void WriteSerializationTestFile<T>(bool useCustomGroup, string json, T obj)
         {
             FileStream fs = File.Open("../../../SerializationReference/" + Path.GetRandomFileName() + ".dat", FileMode.Create);
 
             BinaryWriter bw = new BinaryWriter(fs);
             bw.Write(useCustomGroup);
-            bw.Write(useSubgroupConstruction);
             bw.Write(obj.GetType().FullName);
             bw.Write(json);
 

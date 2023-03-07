@@ -78,32 +78,6 @@ namespace UProveUnitTest
             const string ECCNamePrefix = "U-Prove Recommended Parameters Profile";
             var encoder = System.Text.UnicodeEncoding.UTF8;
             Dictionary<string, byte[]> oidContextDictionary = new Dictionary<string, byte[]>();
-            // Subgroup (OID, NIST domain params seed)
-
-            oidContextDictionary.Add("1.3.6.1.4.1.311.75.1.1.0", 
-                            new byte[] {
-                             0x42, 0xf3, 0x05, 0xc4, 0x7a, 0xfa, 0xa3, 0x3b,
-                             0x97, 0xd7, 0x25, 0x77, 0x5c, 0xc2, 0xfe, 0x61,
-                             0xa8, 0xa1, 0xae, 0xe7
-                            });
-
-            oidContextDictionary.Add("1.3.6.1.4.1.311.75.1.1.1",
-                            new byte[] {
-                             0x22, 0x7c, 0xc8, 0x30, 0x35, 0xac, 0x2c, 0x68,
-                             0xe6, 0xb4, 0xe5, 0xfe, 0x4b, 0x59, 0xc0, 0xa8,
-                             0x4a, 0xe8, 0x03, 0x30, 0xf3, 0x80, 0xde, 0x03,
-                             0x22, 0x3e, 0x37, 0x81, 0x36, 0xd7, 0x6f, 0xc0                                                         
-                            });
-
-            oidContextDictionary.Add("1.3.6.1.4.1.311.75.1.1.2",
-                           new byte[] {
-                            0x31, 0xf2, 0xd6, 0xcf, 0xcd, 0x65, 0x2b, 0x7d,
-                            0xb8, 0x18, 0x6e, 0x84, 0x9d, 0xf1, 0x4b, 0x75,
-                            0x60, 0x40, 0x7b, 0xca, 0x0f, 0x03, 0x04, 0xe0,
-                            0x9e, 0x0d, 0x9d, 0x2c, 0x03, 0xd4, 0xfa, 0x4c
-                           });
-
-
             // Elliptic Curve (OID, ECC Prefix + curve name)
             oidContextDictionary.Add("1.3.6.1.4.1.311.75.1.2.1", encoder.GetBytes(ECCNamePrefix + "P-256"));  // NIST P-256
             oidContextDictionary.Add("1.3.6.1.4.1.311.75.1.2.2", encoder.GetBytes(ECCNamePrefix + "P-384"));  // NIST P-384
@@ -119,11 +93,6 @@ namespace UProveUnitTest
                 Gq.Verify();
                 int counter;
                 byte[] context = oidContextDictionary[oid];
-                if (Gq.Type == GroupType.Subgroup)
-                {
-                    // g is only generated for the subgroup construction
-                    Assert.AreEqual<GroupElement>(Gq.G, Gq.DeriveElement(context, (byte)0, out counter));
-                }
 
                 // tests gi
                 for (int i = 1; i < set.G.Length; i++ )
@@ -183,13 +152,13 @@ namespace UProveUnitTest
             isp.UidP = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             isp.NumberOfAttributes = 1;
             isp.UseRecommendedParameterSet = false; // use freshly generated generators
-            isp.GroupConstruction = GroupType.Subgroup;
+            isp.GroupConstruction = GroupType.ECC;
             IssuerKeyAndParameters ikap = isp.Generate();
             IssuerParameters ip = ikap.IssuerParameters;
 
-            // get the default subgroup to make sure that is _not_ what we are generating
+            // get the default ECC group to make sure that is _not_ what we are generating
             ParameterSet set;
-            ParameterSet.TryGetNamedParameterSet("1.3.6.1.4.1.311.75.1.1.1", out set);
+            ParameterSet.TryGetNamedParameterSet("1.3.6.1.4.1.311.75.1.2.1", out set);
             Assert.AreNotEqual(ip.G[1], set.G[0]); // set's index 0 is g_1
 
             RunProtocol(ikap, ip);
@@ -229,7 +198,7 @@ namespace UProveUnitTest
             // we reuse an exisiting group, but without setting it by name.
             // we expect new generators to be generated.
             ParameterSet set;
-            ParameterSet.TryGetNamedParameterSet(SubgroupParameterSets.ParamSet_SG_2048256_V1Name, out set);
+            ParameterSet.TryGetNamedParameterSet(ECParameterSets.ParamSet_EC_P256_V1Name, out set);
 
             IssuerSetupParameters isp = new IssuerSetupParameters();
             isp.UidP = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };

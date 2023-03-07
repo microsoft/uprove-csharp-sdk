@@ -18,6 +18,5 @@ namespace UProveTestVectors
     class RecommendedParameters
     {
         static public ECRecommendedParameters.ECParams P256 = ECRecommendedParameters.ecParams[(int)ECRecommendedParameters.CurveNames.P256];
-        static public SubgroupRecommendedParameters.SGParams L2048N256 = SubgroupRecommendedParameters.sgParams[(int)SubgroupRecommendedParameters.SGNames.L2048N256];
     }
 }

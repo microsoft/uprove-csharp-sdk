@@ -41,12 +41,6 @@ namespace UProveCrypto
         public string name;
 
         /// <summary>
-        /// The subgroup group description.
-        /// </summary>
-        [DataMember(Name = "sgDesc", Order = 1, EmitDefaultValue = false)]
-        public SubgroupGroupSerializable sgDesc;
-
-        /// <summary>
         /// Construct a GroupSerializable object from a Group object.
         /// </summary>
         /// <param name="group">The Group object being serialized.</param>
@@ -56,18 +50,10 @@ namespace UProveCrypto
             {
                 this.type = "named";
                 this.name = group.GroupName;
-                this.sgDesc = null;
             }
             else if (group.Type == GroupType.ECC)
             {
                 this.type = "ec";
-                this.name = null;
-                this.sgDesc = null;
-            }
-            else if (group.Type == GroupType.Subgroup)
-            {
-                this.type = "sg";
-                this.sgDesc = new SubgroupGroupSerializable((SubgroupGroup)group);
                 this.name = null;
             }
             else
@@ -85,16 +71,9 @@ namespace UProveCrypto
         public Group ToGroup()
         {
             ParameterSet parameterSet;
-            if ((sgDesc != null ? 1 : 0) + (name != null ? 1 : 0) > 1)
-            {
-                throw new UProveSerializationException("Only one of 'name' or 'sgDesc' can be set");
-            }
 
             switch (type)
             {
-                case "sg":
-                    return sgDesc.ToSubgroupGroup();
-
                 case "named":
                     if (ParameterSet.TryGetNamedParameterSet(name, out parameterSet) == false)
                         throw new UProveSerializationException("Unsupported named group :" + this.name);
@@ -115,9 +94,6 @@ namespace UProveCrypto
                 case ECParameterSets.ParamSet_EC_P384_V1Name:
                 case ECParameterSets.ParamSet_EC_P521_V1Name:
                 case ECParameterSets.ParamSet_EC_BN254_V1Name:
-                case SubgroupParameterSets.ParamSet_SG_2048256_V1Name:
-                case SubgroupParameterSets.ParamSet_SG_3072256_V1Name:
-                case SubgroupParameterSets.ParamSet_SG_1024160_V1Name:
                     return true;
 
                 default:
@@ -125,70 +101,6 @@ namespace UProveCrypto
             }
         }
 
-    }
-
-    /// <summary>
-    /// This class is a serializable version of SubgroupGroup used only during serialization.
-    /// Serializing SubgroupGroup will result in the creation and serialization of this class instead.
-    /// This class is also created upon deserialization. The ToSubgroupGroup() method will be called
-    /// by the surrogate class to create a new SubgroupGroup from this class.
-    /// </summary>
-    [DataContract]
-    public class SubgroupGroupSerializable
-    {
-        /// <summary>
-        /// The parameter p.
-        /// </summary>
-        [DataMember(Order = 1)]
-        public string p;
-
-        /// <summary>
-        /// The parameter q.
-        /// </summary>
-        [DataMember(Order = 2)]
-        public string q;
-
-        /// <summary>
-        /// The generator g.
-        /// </summary>
-        [DataMember(Order = 3)]
-        public string g;
-
-        /// <summary>
-        /// Create a SubgrouGroupSerializable object from a SubgroupGroup.
-        /// </summary>
-        /// <param name="group">The group to serialize.</param>
-        public SubgroupGroupSerializable(SubgroupGroup group)
-        {
-            if (group.P == null || group.Q == null || group.G == null)
-            {
-                throw new UProveSerializationException("P, Q, G cannot be null");
-            }
-
-            this.p = group.P.ToBase64String();
-            this.q = group.Q.ToBase64String();
-            this.g = group.G.ToBase64String();
-        }
-
-        /// <summary>
-        /// Create a SubgroupGroup from this serialized form.
-        /// </summary>
-        /// <returns>A SubgroupGroup object.</returns>
-        public SubgroupGroup ToSubgroupGroup()
-        {
-            if (p == null || q == null || g == null)
-            {
-                throw new UProveSerializationException("p, q, g cannot be null");
-            }
-
-            SubgroupGroup group = SubgroupGroup.CreateSubgroupGroup(
-                p.ToByteArray(), 
-                q.ToByteArray(), 
-                g.ToByteArray(), 
-                null, 
-                null);
-            return group;
-        }
     }
 
     #endregion

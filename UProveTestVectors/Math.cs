@@ -25,38 +25,6 @@ namespace UProveTestVectors
         public abstract GroupElement Generator { get; }
     }
 
-    public class SubGroup : Group
-    {
-        private BigInteger p;
-        private BigInteger q;
-        private BigInteger g;
-
-        public SubGroup(BigInteger p, BigInteger q, BigInteger g, string oid)
-        {
-            this.p = p;
-            this.q = q;
-            this.g = g;
-            OID = oid;
-        }
-
-        public BigInteger P { get { return p; } }
-
-        public override GroupElement Identity
-        {
-            get { return new SubgroupElement(BigInteger.One, this); }
-        }
-
-        public override BigInteger Order
-        {
-            get { return q; }
-        }
-
-        public override GroupElement Generator
-        {
-            get { return new SubgroupElement(g, this); }
-        }
-    }
-
     public class P256ECGroup : Group
     {
         public P256ECGroup()
@@ -138,53 +106,5 @@ namespace UProveTestVectors
             return "x=" + point.XCoord.ToBigInteger().ToString(radix) + "," + "y=" + point.YCoord.ToBigInteger().ToString(radix);
         }
 
-    }
-
-    public class SubgroupElement : GroupElement
-    {
-        private BigInteger i;
-        private SubGroup subgroup;
-
-        public SubgroupElement(BigInteger i, SubGroup subgroup)
-        {
-            this.i = i;
-            this.subgroup = subgroup;
-        }
-
-        public override GroupElement Multiply(GroupElement other)
-        {
-            return new SubgroupElement(i.Multiply((other as SubgroupElement).i).Mod(subgroup.P), subgroup);
-        }
-
-        public override GroupElement Exponentiate(BigInteger exponent)
-        {
-            return new SubgroupElement(i.ModPow(exponent, subgroup.P), subgroup);
-        }
-
-        public override void Print(string varLabel, string varType, string varNamespace, Formatter formatter)
-        {
-            formatter.PrintBigInteger(varLabel, varType, varNamespace, i);
-        }
-
-        public override byte[] ToByteArray()
-        {
-            return i.ToByteArrayUnsigned();
-        }
-
-        public override bool Equals(object o)
-        {
-            if (o == null) { return false; }
-            SubgroupElement e = o as SubgroupElement;
-            if ((System.Object)e == null)
-            {
-                return false;
-            }
-            return i.Equals(e.i);
-        }
-
-        public override string ToString(int radix = 16)
-        {
-            return i.ToString(radix);
-        }
     }
 }

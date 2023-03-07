@@ -185,12 +185,7 @@ namespace UProveTestVectors
             object[] preGqArray = new object[] { UIDp };
             object[] postGqArray = new object[] { gToHash, e, S };
             object[] GqArray = null;
-            if (Gq is SubGroup)
-            {
-                SubGroup subgroup = (SubGroup) Gq;
-                GqArray = new object[] { subgroup.P, subgroup.Order, subgroup.Generator.ToByteArray() };
-            }
-            else if (Gq is P256ECGroup)
+            if (Gq is P256ECGroup) // TODO: what about the other groups?
             {
                 FpCurve curve = (FpCurve) RecommendedParameters.P256.parameters.Curve;
                 GqArray = new object[] { curve.Q, curve.A.ToBigInteger(), curve.B.ToBigInteger(), RecommendedParameters.P256.g, RecommendedParameters.P256.parameters.N, BigInteger.One };
@@ -230,17 +225,10 @@ namespace UProveTestVectors
         }
 
         private static readonly int pseudonymIndex = 0;
-        private static readonly byte[] L2048N256DomainParamsSeed = new byte[] { 0x22, 0x7c, 0xc8, 0x30, 0x35, 0xac, 0x2c, 0x68, 0xe6, 0xb4, 0xe5, 0xfe, 0x4b, 0x59, 0xc0, 0xa8, 0x4a, 0xe8, 0x03, 0x30, 0xf3, 0x80, 0xde, 0x03, 0x22, 0x3e, 0x37, 0x81, 0x36, 0xd7, 0x6f, 0xc0 };
 
         public static GroupElement GenerateScopeElement(Group group, byte[] scope, Formatter formater)
         {
-            if (group is SubGroup)
-            {
-                SubGroup subgroup = (SubGroup)group;
-                int counter;
-                return new SubgroupElement(SubgroupRecommendedParameters.FIPS_186_3_AnnexA_2_3(subgroup.P, subgroup.Order, scope, (byte)pseudonymIndex, formater, out counter), subgroup);
-            }
-            else if (group is P256ECGroup)
+            if (group is P256ECGroup) // TODO: what about the other groups?
             {
                 int finalCounter;
                 var curve = (((((group as P256ECGroup).Identity) as ECElement).point as Org.BouncyCastle.Math.EC.ECPoint).Curve as FpCurve);
@@ -276,12 +264,7 @@ namespace UProveTestVectors
 
         internal static object[] GetGroupDescription(Group Gq)
         {
-            if (Gq is SubGroup)
-            {
-                SubGroup subgroup = (SubGroup)Gq;
-                return new object[] { subgroup.P, subgroup.Order, subgroup.Generator.ToByteArray() };
-            }
-            else if (Gq is P256ECGroup)
+            if (Gq is P256ECGroup) // TODO: what about the other groups?
             {
                 FpCurve curve = (FpCurve)RecommendedParameters.P256.parameters.Curve;
                 return new object[] { curve.Q, curve.A.ToBigInteger(), curve.B.ToBigInteger(), RecommendedParameters.P256.g, RecommendedParameters.P256.parameters.N, BigInteger.One };

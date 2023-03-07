@@ -81,13 +81,13 @@ namespace UProveUnitTest
             isp.UidP = new byte[] { 1, 2, 3, 4, 5 };
             isp.E = IssuerSetupParameters.GetDefaultEValues(7);
             isp.UseRecommendedParameterSet = false;
-            isp.GroupConstruction = GroupType.Subgroup;
+            isp.GroupConstruction = GroupType.ECC;
             IssuerKeyAndParameters ikap = isp.Generate();
             IssuerParameters ip = ikap.IssuerParameters;
             ProtocolHelper.VerifyIssuerParameters(ip, false);
             byte[] g0Bytes = ip.G[0].GetEncoded();
             g0Bytes[g0Bytes.Length - 1]++;
-            ip.G[0] = (SubgroupGroupElement)ip.Gq.CreateGroupElement(g0Bytes);
+            ip.G[0] = (ECGroupElement)ip.Gq.CreateGroupElement(g0Bytes);
             try { ProtocolHelper.VerifyIssuerParameters(ip, false); Assert.Fail(); } catch (InvalidUProveArtifactException) { }
         }
 

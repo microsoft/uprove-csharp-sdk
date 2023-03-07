@@ -21,7 +21,7 @@ namespace UProveParams
     /// </summary>
     public class Program
     {
-        static string[] groupNames = { "P-256", "P-384", "P-521", "L2048N256", "L3072N256", "L1024N160" };
+        static string[] groupNames = { "P-256", "P-384", "P-521" };
         static Formatter.Type[] formatterTypes = { 
             // Formatter.Type.code, // uncomment to generate C++ code-style output
             // Formatter.Type.codeCSharp, // uncomment to generate C# code-style output
@@ -58,14 +58,7 @@ namespace UProveParams
                         writer = new System.IO.StreamWriter(outputFile);
                         Formatter formatter = new Formatter(formatterType, writer);
                         formatter.PrintText("U-Prove Recommended Parameters (" + groupName + ")");
-                        if (groupName.StartsWith("L"))
-                        {
-                            SubgroupRecommendedParameters.Print(formatter, groupName);
-                        }
-                        else
-                        {
-                            ECRecommendedParameters.Print(formatter, groupName);
-                        }
+                        ECRecommendedParameters.Print(formatter, groupName);
                         Console.WriteLine("recommended parameters " + groupName + " written to " + outputFile);
                         writer.Close();
                         writer = null;

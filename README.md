@@ -2,11 +2,12 @@
 
 
 The __U-Prove Crypto SDK__ V1.1 (C# Edition) implements the U-Prove Cryptographic
-Specification V1.1 Revision 3 [UPCS]. This SDK was developed by Microsoft to
+Specification V1.1 Revision 5 [UPCS]. This SDK was developed by Microsoft to
 support experimentation with the foundational features of the U-Prove technology.
 It is made available under the Apache 2.0 open-source license, with patent
 rights granted under the Open Specification Promise.
 
+For an overview of the U-Prove technology, see the [technology overview](./docs/U-Prove%20Technology%20Overview%20V1.1%20Revision%203.pdf).
 For more information about U-Prove, visit http://www.microsoft.com/u-prove.
 
 <br>
@@ -93,14 +94,12 @@ The following changes have been made to the original code:
 ## REFERENCES:
 
 
-[UPCS]    Christian Paquin, Greg Zaverucha. U-Prove Cryptographic Specification V1.1.  
-          Microsoft Corporation, December 2013. http://www.microsoft.com/u-prove.  
-	  "docs/U-Prove Cryptographic Specification V1.1 Revision 3.pdf"
+[UPCS]    Christian Paquin, Greg Zaverucha. U-Prove Cryptographic Specification V1.1 Revision 5.
+          Microsoft Corporation, March 2023.
+	        ([link](./docs/U-Prove%20Cryptographic%20Specification%20V1.1%20Revision%205.pdf))
 
-[UPTV]	  U-Prove Cryptographic Test Vectors V1.1 (Revision 3)  
-          http://research.microsoft.com/apps/pubs/default.aspx?id=166983
-	  docs/testvectors
+[UPTV]	  U-Prove Cryptographic Test Vectors V1.1 Revision 3
+          [docs/testvectors](./docs/testvectors/)
 
-[UPRP]    U-Prove Recommended Parameters Profile V1.1 (Revision 2)  
-          http://research.microsoft.com/apps/pubs/default.aspx?id=166972
-	  "docs/U-Prove Recommended Parameters Profile V1.1 Revision 2.pdf"
+[UPRP]    U-Prove Recommended Parameters Profile V1.1 Revision 3
+          ([link](./docs/U-Prove%20Recommended%20Parameters%20Profile%20V1.1%20Revision%203.pdf))

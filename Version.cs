@@ -22,8 +22,8 @@ using System.Reflection;
 
 
 // set the version number
-[assembly: AssemblyVersionAttribute("1.1.3.2")]
-[assembly: AssemblyFileVersionAttribute("1.1.3.2")]
+[assembly: AssemblyVersionAttribute("1.1.5.1")]
+[assembly: AssemblyFileVersionAttribute("1.1.5.1")]
 
 
 // common info
